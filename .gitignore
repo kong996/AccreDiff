@@ -1,0 +1,89 @@
+####################################
+# Python bytecode & cache
+####################################
+__pycache__/
+*.py[cod]
+*$py.class
+
+####################################
+# C extensions
+####################################
+*.so
+
+####################################
+# Distribution / packaging
+####################################
+.Python
+build/
+dist/
+downloads/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+MANIFEST
+
+####################################
+# Installer logs
+####################################
+pip-log.txt
+pip-delete-this-directory.txt
+
+####################################
+# Unit test / coverage reports
+####################################
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+####################################
+# Jupyter Notebook
+####################################
+.ipynb_checkpoints/
+
+####################################
+# Virtual environments
+####################################
+.venv/
+venv/
+env/
+ENV/
+
+####################################
+# IDE / Editor
+####################################
+.vscode/
+.idea/
+*.swp
+*.swo
+
+####################################
+# macOS
+####################################
+.DS_Store
+
+####################################
+# Logs
+####################################
+*.log
+
+####################################
+# Large data files (optional)
+# Uncomment if needed
+####################################
+# *.dat
+# *.csv
+# *.xlsx
+# data/
+notebooks/
+####################################
+# Build artifacts
+####################################
+*.whl
+*.tar.gz
