@@ -1,6 +1,6 @@
 # accrediff/__init__.py
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __author__ = "Zhihui Kong"
 __email__ = "kongzh0508@163.com"
 
@@ -46,7 +46,15 @@ from .melt_model import MeltScalingModel
 # --- Utilities / plotting ---
 from .utils import normalize_max, power_law, error_rate, WeightedECDF
 #from .plotting import images_to_video
-
+# --- Gas disk migration (Cresswell & Nelson 2008) ---
+from .gas_migration import (
+    Gas_ModelConfig,
+    Gas_UnitSystem,
+    Gas_DiskModel,
+    Gas_TorqueModel,
+    Gas_MigrationIntegrator,
+    Gas_build_model,
+)
 __all__ = [
     "__version__",
     "__author__",
