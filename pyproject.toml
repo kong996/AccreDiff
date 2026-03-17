@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "accrediff"
-version = "0.2.0"
+version = "0.3.0"
 description = "A coupled accretion–differentiation framework for terrestrial planet formation"
 readme = "README.md"
 requires-python = ">=3.10"

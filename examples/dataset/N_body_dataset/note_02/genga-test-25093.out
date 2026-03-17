@@ -1,0 +1,1291 @@
+Restart GENGA
+Read parameters
+Parameters OK
+Read Size
+Size OK
+
+ ******** Simulation path  ********
+
+Genga Version: 3.193
+Mercurial Branch: nogit
+Mercurial Commit: nogit
+Build Date: 2025年 05月 24日 星期六 12:58:35 CST
+Build Path: /public/home/zhkong/kong_2025/gengamod/source
+Build System: Linux node70 4.18.0-348.el8.x86_64 #1 SMP Tue Oct 19 15:14:17 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux
+Build Compute Capability: SM=80
+Device Name: NVIDIA A800-SXM4-80GB, Major:8, Minor:0
+Number of devices: 1
+Device number 0: 0
+Do Kick in single precision: 0
+Serial Grouping: 0
+Do kernel tuning: 1
+Do symplectic level tuning: 1
+Compute Poincare Section: 0
+FormatS: 0
+FormatT: 0
+FormatP: 1
+FormatO: 0
+NmaxM: 32
+Time step in days: 6 
+Starting time: 0 
+Output name: note_02
+Energy output interval: 6000000
+Coordinates output interval: 6000000
+Number of outputs per interval: 1
+Coordinate output buffer: 1
+Use Irregular outputs: 0
+Irregular output calendar: -
+Use Transits: 0
+Use RV: 0
+TTV file name: -
+RV file name: -
+Print Transits: 0
+Print RV: 0
+Print MCMC: 0
+MCMC NE: 0
+MCMC Restart: 0
+Integration steps: 6000000000
+Central Mass: 1
+Star Radius: 0.00465476
+Star Love Number: 1
+Star fluid Love Number: 1
+Star tau: 0
+Star spin_x: 0
+Star spin_y: 0
+Star spin_z: 0
+Star Ic: 0.4
+J2: 0
+J2 radius: 0
+Solar Constant: 1367
+n1: 3
+n2: 0.4
+Input file: note_002.dat
+Input file format: x y z m vx vy vz 
+Output file format: t i m r x y z vx vy vz Sx Sy Sz amin amax emin emax aec aecT encc test 
+Use output binary files: 0
+Angle units: 0
+Default rho: 3
+Inner truncation radius: 0.5
+Outer truncation radius: 50
+MaxColl: 120
+pc: 3
+cef: 1
+Number of bodies: 435
+Number of test particles: 0
+Minimal number of bodies: 1
+Minimal number of test particles: 0
+Test Particle Mode: 0
+Particle Minimum Mass : 0
+Symplectic recursion Max levels : 3
+Symplectic recursion levels : 3
+Symplectic recursion sub steps : 2
+Restart time step: 1800000000
+Order of Symplectic integrator: 2
+Maximum encounter pairs: 1024
+Nfragments: 0
+Use aeGrid: 0
+aeGrid amin: 0.000000
+aeGrid amax: 5.000000
+aeGrid emin: 0.000000
+aeGrid emax: 1.000000
+aeGrid imin: 0.000000
+aeGrid imax: 0.100000
+aeGrid Na: 10
+aeGrid Ne: 10
+aeGrid Ni: 10
+aeGrid Count Start: 1
+aeGrid name: A
+Use gas disk: 0
+Use gas disk enhancement: 0
+Use gas disk potential: 1
+Use gas disk drag: 2
+Use gas disk tidal damping: 2
+Gas dTau_diss: 1e+06
+Gas disk inner edge: 0.1
+Gas disk outer edge: 35
+Gas disk grid outer edge: 15
+Gas disk grid dr: 0.1
+Gas alpha: 1
+Gas beta: 0.25
+Gas Sigma_10: 1600
+Gas Mgiant: 0.0001
+Use force (Old): 0
+Use GR: 0
+Use Tides: 0
+Use Rotational Deformation: 0
+Use Yarkovsky: 0
+Use Poynting-Robertson: 0
+Radiation Pressure Coefficient Qpr: 1
+Use Migration Force: 0
+Solar Wind factor: 0
+Use Small Collisions: 0
+Create Particles file name: -
+Use Set Elemets function: 0
+Set Elements file name: -
+Gas file name: -
+Report Encounters: 0
+Report Encounters Radius: 3
+Report Encounters Cloud Size: 1
+Stop at close Encounters: 0
+Stop at close Encounter Radius: 1
+Stop at Collision: 0
+Stop collision minimum mass: 0
+Collision precision: 0.0001
+Collision Time Shift: 1
+Collision Model: 0
+Asteroid emissivity: 0.95
+Asteroid density: 3500
+Asteroid specific heat capacity: 680
+Asteroid albedo: 0.2
+Asteroid thermal conductivity: 2.65
+Asteroid collisional velocity V: 5000
+Asteroid minimal fragment radius: 0.01
+Asteroid fragment remove radius: 0.01
+Runtime Version: 12050
+Driver Version: 12050
+
+Initialize Memory
+
+Read Initial Conditions
+Initial Conditions OK
+Compute initial Energy
+Write initial Energy
+Energy OK
+Starting FG kernel parameters tuning
+tx:32    	time: 0.000104447998106 s
+tx:64    	time: 0.000017408000305 s
+tx:128    	time: 0.000018432000652 s
+tx:256    	time: 0.000019455999136 s
+Best parameters: tx:64	 time: 0.000017408000305 s
+Starting Rcrit kernel parameters tuning
+tx:32    	time: 0.000058368001133 s
+tx:64    	time: 0.000008191999979 s
+tx:128    	time: 0.000008191999979 s
+tx:256    	time: 0.000008191999979 s
+Best parameters: tx:64	 time: 0.000008191999979 s
+
+Starting Kick kernel parameters tuning
+kick32c time: 0.000250880002975 s
+p:1    	tx:1    	ty:256    	time: 0.000233472004533 s
+p:1    	tx:1    	ty:128    	time: 0.000148479998112 s
+p:1    	tx:1    	ty:64    	time: 0.000159743994474 s
+p:1    	tx:1    	ty:32    	time: 0.000214016005397 s
+p:1    	tx:32    	ty:16    	time: 0.000920575976372 s
+p:1    	tx:32    	ty:8    	time: 0.000647167980671 s
+p:1    	tx:32    	ty:4    	time: 0.001033215999603 s
+p:1    	tx:32    	ty:2    	time: 0.001935359954834 s
+p:1    	tx:32    	ty:1    	time: 0.003685375928879 s
+p:1    	tx:128    	ty:4    	time: 0.001166336059570 s
+p:1    	tx:128    	ty:2    	time: 0.001882112026215 s
+p:1    	tx:128    	ty:1    	time: 0.003420160055161 s
+p:1    	tx:256    	ty:2    	time: 0.002103296041489 s
+p:1    	tx:256    	ty:1    	time: 0.003458048105240 s
+p:2    	tx:1    	ty:256    	time: 0.000204799994826 s
+p:2    	tx:1    	ty:128    	time: 0.000164864003658 s
+p:2    	tx:1    	ty:64    	time: 0.000192512005568 s
+p:2    	tx:1    	ty:32    	time: 0.000269311994314 s
+p:2    	tx:32    	ty:16    	time: 0.001720319986343 s
+p:2    	tx:32    	ty:8    	time: 0.000991231977940 s
+p:2    	tx:32    	ty:4    	time: 0.001451007962227 s
+p:2    	tx:32    	ty:2    	time: 0.002720767974854 s
+p:2    	tx:32    	ty:1    	time: 0.005106688022614 s
+p:2    	tx:128    	ty:4    	time: 0.001842175960541 s
+p:2    	tx:128    	ty:2    	time: 0.002686975955963 s
+p:2    	tx:128    	ty:1    	time: 0.004696063995361 s
+p:2    	tx:256    	ty:2    	time: 0.003366911888123 s
+p:2    	tx:256    	ty:1    	time: 0.005069824218750 s
+p:4    	tx:1    	ty:256    	time: 0.000198655992746 s
+p:4    	tx:1    	ty:128    	time: 0.000212991997600 s
+p:4    	tx:1    	ty:64    	time: 0.000264191985130 s
+p:4    	tx:1    	ty:32    	time: 0.000390143990517 s
+p:4    	tx:32    	ty:16    	time: 0.003334144115448 s
+p:4    	tx:32    	ty:8    	time: 0.001736703991890 s
+p:4    	tx:32    	ty:4    	time: 0.002357248067856 s
+p:4    	tx:32    	ty:2    	time: 0.004267007827759 s
+p:4    	tx:32    	ty:1    	time: 0.008238080024719 s
+p:4    	tx:128    	ty:4    	time: 0.003179519891739 s
+p:4    	tx:128    	ty:2    	time: 0.004490240097046 s
+p:4    	tx:128    	ty:1    	time: 0.007706624031067 s
+p:4    	tx:256    	ty:2    	time: 0.004600831985474 s
+p:4    	tx:256    	ty:1    	time: 0.007797760009766 s
+Best parameters: p:1	 tx:1	 ty:128	 time: 0.000148479998112 s
+Total acc4C + kick32Ab time: 0.000246784001589 s
+Use acc kernel
+
+Starting close-encounter parameters tuning
+    Precheck-pairs:    3
+    CE:    1; groups: 1; 2: 1; 
+Close-encounter time: Symplectic levels: 1, Symplectic sub steps: 2,  0.000292351990938 s
+    Precheck-pairs:    3
+    CE:    0; groups: 0; 
+Close-encounter time: Symplectic levels: 2, Symplectic sub steps: 2,  0.000286208003759 s
+    Precheck-pairs:    3
+    CE:    0; groups: 0; 
+Close-encounter time: Symplectic levels: 2, Symplectic sub steps: 4,  0.000171391993761 s
+    Precheck-pairs:    3
+    CE:    0; groups: 0; 
+Close-encounter time: Symplectic levels: 2, Symplectic sub steps: 8,  0.000304672002792 s
+    Precheck-pairs:    3
+    CE:    0; groups: 0; 
+Close-encounter time: Symplectic levels: 2, Symplectic sub steps: 10,  0.000381632000208 s
+    Precheck-pairs:    3
+    CE:    0; groups: 0; 
+Close-encounter time: Symplectic levels: 3, Symplectic sub steps: 2,  0.000098783999681 s
+    Precheck-pairs:    3
+    CE:    0; groups: 0; 
+Close-encounter time: Symplectic levels: 3, Symplectic sub steps: 4,  0.000178527995944 s
+    Precheck-pairs:    3
+    CE:    0; groups: 0; 
+Close-encounter time: Symplectic levels: 3, Symplectic sub steps: 8,  0.000307904005051 s
+    Precheck-pairs:    3
+    CE:    0; groups: 0; 
+Close-encounter time: Symplectic levels: 3, Symplectic sub steps: 10,  0.000378495991230 s
+
+Best parameters: Symplectic levels: 3, Symplectic sub steps: 2,  0.000098783999681 s
+
+Start integration with 1 simulation
+first kick OK
+Body 5691 too close to central mass -> removed
+Body 6036 too close to central mass -> removed
+Body 6131 too close to central mass -> removed
+Body 2498 too close to central mass -> removed
+Body 6576 too close to central mass -> removed
+Reached timestep 1806000000 with 430 bodies, 0 test particles. Total Energy: -3.3135831690446461641e-08
+Collision between body 6655 and 5235 at time step 1806946332
+Reached timestep 1812000000 with 429 bodies, 0 test particles. Total Energy: -3.3135837418468373033e-08
+Reached timestep 1818000000 with 429 bodies, 0 test particles. Total Energy: -3.3135841519717663565e-08
+Collision between body 4189 and 6303 at time step 1823501013
+Reached timestep 1824000000 with 428 bodies, 0 test particles. Total Energy: -3.3135843565421576802e-08
+Reached timestep 1830000000 with 428 bodies, 0 test particles. Total Energy: -3.3135849514512668506e-08
+Body 6185 too close to central mass -> removed
+Reached timestep 1836000000 with 427 bodies, 0 test particles. Total Energy: -3.3135856174753438752e-08
+Body 5453 too close to central mass -> removed
+Body 172 too close to central mass -> removed
+Body 6053 too close to central mass -> removed
+Reached timestep 1842000000 with 424 bodies, 0 test particles. Total Energy: -3.3135856551521859618e-08
+Body 6504 too close to central mass -> removed
+Reached timestep 1848000000 with 423 bodies, 0 test particles. Total Energy: -3.3135860214490395943e-08
+Reached timestep 1854000000 with 423 bodies, 0 test particles. Total Energy: -3.3135863923064377289e-08
+Body 5984 too close to central mass -> removed
+Reached timestep 1860000000 with 422 bodies, 0 test particles. Total Energy: -3.3135866650854184153e-08
+Body 5368 too close to central mass -> removed
+Reached timestep 1866000000 with 421 bodies, 0 test particles. Total Energy: -3.3135873160302952903e-08
+Body 6037 too close to central mass -> removed
+Body 5954 too close to central mass -> removed
+Collision between body 5360 and 6573 at time step 1871463767
+Reached timestep 1872000000 with 418 bodies, 0 test particles. Total Energy: -3.3135878393475630129e-08
+Body 5952 too close to central mass -> removed
+Reached timestep 1878000000 with 417 bodies, 0 test particles. Total Energy: -3.313588068378534068e-08
+Collision between body 5446 and 5551 at time step 1878641881
+Collision between body 93 and 5688 at time step 1882302372
+Body 6266 ejected
+Reached timestep 1884000000 with 414 bodies, 0 test particles. Total Energy: -3.3135887044817049352e-08
+Collision between body 6604 and 2182 at time step 1887811169
+Reached timestep 1890000000 with 413 bodies, 0 test particles. Total Energy: -3.313589002138640176e-08
+Reached timestep 1896000000 with 413 bodies, 0 test particles. Total Energy: -3.3135896279412749821e-08
+Body 6507 too close to central mass -> removed
+Body 6180 ejected
+Body 6337 too close to central mass -> removed
+Reached timestep 1902000000 with 410 bodies, 0 test particles. Total Energy: -3.3135901326207539881e-08
+Body 6791 ejected
+Collision between body 6035 and 6730 at time step 1905646497
+Reached timestep 1908000000 with 408 bodies, 0 test particles. Total Energy: -3.3135907732092984919e-08
+Body 5321 too close to central mass -> removed
+Reached timestep 1914000000 with 407 bodies, 0 test particles. Total Energy: -3.3135910244438896241e-08
+Collision between body 4406 and 5753 at time step 1915062419
+Collision between body 2413 and 6615 at time step 1918682558
+Reached timestep 1920000000 with 405 bodies, 0 test particles. Total Energy: -3.3135917469150793604e-08
+Body 6808 too close to central mass -> removed
+Body 6618 too close to central mass -> removed
+Reached timestep 1926000000 with 403 bodies, 0 test particles. Total Energy: -3.3135920776568839548e-08
+Reached timestep 1932000000 with 403 bodies, 0 test particles. Total Energy: -3.3135924776336449393e-08
+Body 4750 too close to central mass -> removed
+Body 5407 too close to central mass -> removed
+Reached timestep 1938000000 with 401 bodies, 0 test particles. Total Energy: -3.3135929593640354653e-08
+Body 5374 too close to central mass -> removed
+Collision between body 4189 and 1147 at time step 1940235235
+Reached timestep 1944000000 with 399 bodies, 0 test particles. Total Energy: -3.3135937574509502667e-08
+Collision between body 1123 and 4732 at time step 1945518482
+Body 5182 too close to central mass -> removed
+Collision between body 6089 and 4781 at time step 1948140994
+Body 6068 too close to central mass -> removed
+Reached timestep 1950000000 with 395 bodies, 0 test particles. Total Energy: -3.3135943745740093456e-08
+Body 5776 too close to central mass -> removed
+Body 6132 too close to central mass -> removed
+Collision between body 4189 and 6407 at time step 1955667350
+Reached timestep 1956000000 with 392 bodies, 0 test particles. Total Energy: -3.313594784125762453e-08
+Body 5401 too close to central mass -> removed
+Reached timestep 1962000000 with 391 bodies, 0 test particles. Total Energy: -3.313595393283248257e-08
+Body 6501 too close to central mass -> removed
+Body 6895 too close to central mass -> removed
+Body 5170 too close to central mass -> removed
+Body 5864 too close to central mass -> removed
+Reached timestep 1968000000 with 387 bodies, 0 test particles. Total Energy: -3.3135959974595543209e-08
+Reached timestep 1974000000 with 387 bodies, 0 test particles. Total Energy: -3.3135965659949380875e-08
+Body 1959 too close to central mass -> removed
+Reached timestep 1980000000 with 386 bodies, 0 test particles. Total Energy: -3.3135970401655635298e-08
+Body 3751 too close to central mass -> removed
+Reached timestep 1986000000 with 385 bodies, 0 test particles. Total Energy: -3.3135976786870750036e-08
+Body 1298 too close to central mass -> removed
+Body 6253 too close to central mass -> removed
+Reached timestep 1992000000 with 383 bodies, 0 test particles. Total Energy: -3.313598429192061562e-08
+Collision between body 5818 and 6395 at time step 1992537949
+Body 5514 too close to central mass -> removed
+Body 6457 too close to central mass -> removed
+Reached timestep 1998000000 with 380 bodies, 0 test particles. Total Energy: -3.3135987340578268722e-08
+Collision between body 2768 and 6123 at time step 2002771471
+Body 3887 too close to central mass -> removed
+Reached timestep 2004000000 with 378 bodies, 0 test particles. Total Energy: -3.3135992362644937738e-08
+Body 5663 ejected
+Reached timestep 2010000000 with 377 bodies, 0 test particles. Total Energy: -3.3135993897851596317e-08
+Body 6876 ejected
+Body 5380 too close to central mass -> removed
+Reached timestep 2016000000 with 375 bodies, 0 test particles. Total Energy: -3.3135999750446649879e-08
+Body 6642 too close to central mass -> removed
+Reached timestep 2022000000 with 374 bodies, 0 test particles. Total Energy: -3.3136003740017888863e-08
+Collision between body 93 and 5426 at time step 2023003203
+Body 6996 too close to central mass -> removed
+Reached timestep 2028000000 with 372 bodies, 0 test particles. Total Energy: -3.3136005858781331947e-08
+Collision between body 4189 and 6243 at time step 2028350609
+Reached timestep 2034000000 with 371 bodies, 0 test particles. Total Energy: -3.3136009148960338354e-08
+Collision between body 6023 and 6153 at time step 2036551099
+Collision between body 2768 and 6683 at time step 2038533313
+Reached timestep 2040000000 with 369 bodies, 0 test particles. Total Energy: -3.313601488787938817e-08
+Body 6942 too close to central mass -> removed
+Body 6332 too close to central mass -> removed
+Reached timestep 2046000000 with 367 bodies, 0 test particles. Total Energy: -3.3136020197113480007e-08
+Reached timestep 2052000000 with 367 bodies, 0 test particles. Total Energy: -3.3136024020054081502e-08
+Reached timestep 2058000000 with 367 bodies, 0 test particles. Total Energy: -3.3136026607139751487e-08
+Collision between body 2768 and 6421 at time step 2058786006
+Reached timestep 2064000000 with 366 bodies, 0 test particles. Total Energy: -3.3136029070032927967e-08
+Reached timestep 2070000000 with 366 bodies, 0 test particles. Total Energy: -3.3136035452156564353e-08
+Body 5420 ejected
+Collision between body 5417 and 5490 at time step 2074689808
+Reached timestep 2076000000 with 364 bodies, 0 test particles. Total Energy: -3.3136044915002947804e-08
+Collision between body 6189 and 5605 at time step 2077011878
+Body 5367 too close to central mass -> removed
+Reached timestep 2082000000 with 362 bodies, 0 test particles. Total Energy: -3.3136049897584547326e-08
+Reached timestep 2088000000 with 362 bodies, 0 test particles. Total Energy: -3.3136051112091396447e-08
+Body 6819 too close to central mass -> removed
+Body 6923 too close to central mass -> removed
+Reached timestep 2094000000 with 360 bodies, 0 test particles. Total Energy: -3.3136053753495972467e-08
+Collision between body 6118 and 5423 at time step 2098602696
+Reached timestep 2100000000 with 359 bodies, 0 test particles. Total Energy: -3.3136060841180994144e-08
+Body 6807 too close to central mass -> removed
+Body 6415 too close to central mass -> removed
+Reached timestep 2106000000 with 357 bodies, 0 test particles. Total Energy: -3.3136062994838376389e-08
+Body 5623 too close to central mass -> removed
+Body 5877 too close to central mass -> removed
+Reached timestep 2112000000 with 355 bodies, 0 test particles. Total Energy: -3.3136066857520374105e-08
+Body 6690 too close to central mass -> removed
+Body 2778 too close to central mass -> removed
+Body 117 too close to central mass -> removed
+Body 1127 too close to central mass -> removed
+Reached timestep 2118000000 with 351 bodies, 0 test particles. Total Energy: -3.3136065739376453223e-08
+Body 5494 too close to central mass -> removed
+Body 6054 too close to central mass -> removed
+Reached timestep 2124000000 with 349 bodies, 0 test particles. Total Energy: -3.3136075036733430496e-08
+Body 4581 too close to central mass -> removed
+Reached timestep 2130000000 with 348 bodies, 0 test particles. Total Energy: -3.3136081913262230791e-08
+Reached timestep 2136000000 with 348 bodies, 0 test particles. Total Energy: -3.3136095255472052351e-08
+Body 5200 too close to central mass -> removed
+Body 4313 too close to central mass -> removed
+Body 5142 too close to central mass -> removed
+Body 1465 too close to central mass -> removed
+Reached timestep 2142000000 with 344 bodies, 0 test particles. Total Energy: -3.3136099496704079006e-08
+Body 5382 too close to central mass -> removed
+Collision between body 4189 and 6725 at time step 2145981313
+Body 6676 too close to central mass -> removed
+Reached timestep 2148000000 with 341 bodies, 0 test particles. Total Energy: -3.3136112900386059399e-08
+Body 6404 too close to central mass -> removed
+Collision between body 4189 and 5470 at time step 2151150111
+Reached timestep 2154000000 with 339 bodies, 0 test particles. Total Energy: -3.3136128289913908122e-08
+Reached timestep 2160000000 with 339 bodies, 0 test particles. Total Energy: -3.3136129954703339654e-08
+Body 5386 too close to central mass -> removed
+Body 5661 too close to central mass -> removed
+Body 5576 too close to central mass -> removed
+Collision between body 5181 and 5361 at time step 2163268095
+Reached timestep 2166000000 with 335 bodies, 0 test particles. Total Energy: -3.3136136803737470333e-08
+Body 5767 too close to central mass -> removed
+Body 6121 too close to central mass -> removed
+Body 6189 too close to central mass -> removed
+Reached timestep 2172000000 with 332 bodies, 0 test particles. Total Energy: -3.3136155247903706362e-08
+Reached timestep 2178000000 with 332 bodies, 0 test particles. Total Energy: -3.3136164307442770133e-08
+Body 5668 too close to central mass -> removed
+Collision between body 93 and 6604 at time step 2178518824
+Collision between body 4189 and 93 at time step 2178825288
+Body 6358 too close to central mass -> removed
+Collision between body 6411 and 5406 at time step 2181417941
+Reached timestep 2184000000 with 327 bodies, 0 test particles. Total Energy: -3.3136170290192886518e-08
+Reached timestep 2190000000 with 327 bodies, 0 test particles. Total Energy: -3.3136178625767053684e-08
+Body 6565 too close to central mass -> removed
+Reached timestep 2196000000 with 326 bodies, 0 test particles. Total Energy: -3.3136186117692937844e-08
+Body 5455 too close to central mass -> removed
+Body 6118 too close to central mass -> removed
+Reached timestep 2202000000 with 324 bodies, 0 test particles. Total Energy: -3.3136192658213972063e-08
+Reached timestep 2208000000 with 324 bodies, 0 test particles. Total Energy: -3.313620569627398225e-08
+Body 3761 too close to central mass -> removed
+Collision between body 4189 and 5796 at time step 2213774241
+Reached timestep 2214000000 with 322 bodies, 0 test particles. Total Energy: -3.3136215417724057447e-08
+Collision between body 4189 and 5750 at time step 2214113747
+Body 3770 too close to central mass -> removed
+Reached timestep 2220000000 with 320 bodies, 0 test particles. Total Energy: -3.3136218668916261492e-08
+Body 6737 too close to central mass -> removed
+Body 5535 too close to central mass -> removed
+Reached timestep 2226000000 with 318 bodies, 0 test particles. Total Energy: -3.313622259793932224e-08
+Body 5895 too close to central mass -> removed
+Body 6691 too close to central mass -> removed
+Collision between body 0 and 4662 at time step 2230247508
+Body 5713 ejected
+Body 2895 too close to central mass -> removed
+Reached timestep 2232000000 with 313 bodies, 0 test particles. Total Energy: -3.3136240191108470352e-08
+Body 6061 too close to central mass -> removed
+Body 6242 too close to central mass -> removed
+Body 6586 too close to central mass -> removed
+Reached timestep 2238000000 with 310 bodies, 0 test particles. Total Energy: -3.3136252222666711566e-08
+Body 6633 too close to central mass -> removed
+Body 5807 too close to central mass -> removed
+Body 5018 too close to central mass -> removed
+Body 5880 too close to central mass -> removed
+Body 6836 too close to central mass -> removed
+Reached timestep 2244000000 with 305 bodies, 0 test particles. Total Energy: -3.3136260440166623319e-08
+Body 2174 too close to central mass -> removed
+Reached timestep 2250000000 with 304 bodies, 0 test particles. Total Energy: -3.3136288216054049319e-08
+Body 6897 too close to central mass -> removed
+Body 5132 too close to central mass -> removed
+Reached timestep 2256000000 with 302 bodies, 0 test particles. Total Energy: -3.3136293495733229332e-08
+Body 5780 too close to central mass -> removed
+Body 6528 too close to central mass -> removed
+Body 5259 too close to central mass -> removed
+Collision between body 3324 and 6709 at time step 2260468305
+Reached timestep 2262000000 with 298 bodies, 0 test particles. Total Energy: -3.3136304352642961134e-08
+Body 6138 too close to central mass -> removed
+Body 6445 too close to central mass -> removed
+Body 6411 too close to central mass -> removed
+Body 5123 too close to central mass -> removed
+Body 5538 too close to central mass -> removed
+Reached timestep 2268000000 with 293 bodies, 0 test particles. Total Energy: -3.313631166272466889e-08
+Body 1124 too close to central mass -> removed
+Body 6083 too close to central mass -> removed
+Body 5181 too close to central mass -> removed
+Reached timestep 2274000000 with 290 bodies, 0 test particles. Total Energy: -3.3136333027980995564e-08
+Body 6582 too close to central mass -> removed
+Body 5782 too close to central mass -> removed
+Body 5209 too close to central mass -> removed
+Body 5362 too close to central mass -> removed
+Reached timestep 2280000000 with 286 bodies, 0 test particles. Total Energy: -3.3136359448707053166e-08
+Body 5741 too close to central mass -> removed
+Body 6532 too close to central mass -> removed
+Body 1123 too close to central mass -> removed
+Body 5076 too close to central mass -> removed
+Body 5798 too close to central mass -> removed
+Reached timestep 2286000000 with 281 bodies, 0 test particles. Total Energy: -3.3136372789936619378e-08
+Body 6751 too close to central mass -> removed
+Reached timestep 2292000000 with 280 bodies, 0 test particles. Total Energy: -3.3136384436172419427e-08
+Collision between body 2768 and 5358 at time step 2296566575
+Reached timestep 2298000000 with 279 bodies, 0 test particles. Total Energy: -3.3136395067920551084e-08
+Body 5364 too close to central mass -> removed
+Body 5927 ejected
+Reached timestep 2304000000 with 277 bodies, 0 test particles. Total Energy: -3.313639935914888274e-08
+Body 6272 too close to central mass -> removed
+Body 6577 too close to central mass -> removed
+Body 5678 too close to central mass -> removed
+Reached timestep 2310000000 with 274 bodies, 0 test particles. Total Energy: -3.3136407625831921395e-08
+Body 6167 too close to central mass -> removed
+Body 6780 too close to central mass -> removed
+Body 6017 too close to central mass -> removed
+Reached timestep 2316000000 with 271 bodies, 0 test particles. Total Energy: -3.3136411861978448261e-08
+Body 5890 too close to central mass -> removed
+Body 6162 too close to central mass -> removed
+Body 6202 too close to central mass -> removed
+Body 6740 too close to central mass -> removed
+Reached timestep 2322000000 with 267 bodies, 0 test particles. Total Energy: -3.3136420755751132699e-08
+Body 6356 too close to central mass -> removed
+Reached timestep 2328000000 with 266 bodies, 0 test particles. Total Energy: -3.3136421362151681108e-08
+Body 6035 too close to central mass -> removed
+Reached timestep 2334000000 with 265 bodies, 0 test particles. Total Energy: -3.3136429383477074829e-08
+Body 6978 too close to central mass -> removed
+Reached timestep 2340000000 with 264 bodies, 0 test particles. Total Energy: -3.313643456908335297e-08
+Reached timestep 2346000000 with 264 bodies, 0 test particles. Total Energy: -3.3136432997191366573e-08
+Body 6653 too close to central mass -> removed
+Reached timestep 2352000000 with 263 bodies, 0 test particles. Total Energy: -3.3136438149493626099e-08
+Reached timestep 2358000000 with 263 bodies, 0 test particles. Total Energy: -3.3136447845601104172e-08
+Body 5469 too close to central mass -> removed
+Body 5625 ejected
+Collision between body 2768 and 1239 at time step 2363031438
+Reached timestep 2364000000 with 260 bodies, 0 test particles. Total Energy: -3.3136455019736035598e-08
+Collision between body 5047 and 6992 at time step 2369735980
+Reached timestep 2370000000 with 259 bodies, 0 test particles. Total Energy: -3.3136460643117594416e-08
+Body 5818 too close to central mass -> removed
+Reached timestep 2376000000 with 258 bodies, 0 test particles. Total Energy: -3.3136462743706086114e-08
+Body 5518 too close to central mass -> removed
+Reached timestep 2382000000 with 257 bodies, 0 test particles. Total Energy: -3.3136466512163549826e-08
+Body 6891 too close to central mass -> removed
+Reached timestep 2388000000 with 256 bodies, 0 test particles. Total Energy: -3.3136476869766066737e-08
+Body 6677 too close to central mass -> removed
+Reached timestep 2394000000 with 255 bodies, 0 test particles. Total Energy: -3.3136504182840275481e-08
+Reached timestep 2400000000 with 255 bodies, 0 test particles. Total Energy: -3.3136528047602109417e-08
+Reached timestep 2406000000 with 255 bodies, 0 test particles. Total Energy: -3.3136537636808550302e-08
+Reached timestep 2412000000 with 255 bodies, 0 test particles. Total Energy: -3.3136540990164759777e-08
+Body 3324 too close to central mass -> removed
+Reached timestep 2418000000 with 254 bodies, 0 test particles. Total Energy: -3.3136551481173973265e-08
+Reached timestep 2424000000 with 254 bodies, 0 test particles. Total Energy: -3.3136553962461231201e-08
+Body 6402 ejected
+Reached timestep 2430000000 with 253 bodies, 0 test particles. Total Energy: -3.3136571657021698789e-08
+Body 5344 too close to central mass -> removed
+Reached timestep 2436000000 with 252 bodies, 0 test particles. Total Energy: -3.3136587281870017458e-08
+Reached timestep 2442000000 with 252 bodies, 0 test particles. Total Energy: -3.3136590223704083946e-08
+Body 5928 too close to central mass -> removed
+Reached timestep 2448000000 with 251 bodies, 0 test particles. Total Energy: -3.3136592143485200657e-08
+Reached timestep 2454000000 with 251 bodies, 0 test particles. Total Energy: -3.3136597445525309324e-08
+Reached timestep 2460000000 with 251 bodies, 0 test particles. Total Energy: -3.3136606588699857059e-08
+Reached timestep 2466000000 with 251 bodies, 0 test particles. Total Energy: -3.3136611175657949961e-08
+Body 6617 ejected
+Reached timestep 2472000000 with 250 bodies, 0 test particles. Total Energy: -3.3136612879314275753e-08
+Body 6480 too close to central mass -> removed
+Reached timestep 2478000000 with 249 bodies, 0 test particles. Total Energy: -3.313661622201059544e-08
+Body 4963 too close to central mass -> removed
+Reached timestep 2484000000 with 248 bodies, 0 test particles. Total Energy: -3.3136621241767008563e-08
+Body 6170 too close to central mass -> removed
+Collision between body 2768 and 5417 at time step 2485741100
+Reached timestep 2490000000 with 246 bodies, 0 test particles. Total Energy: -3.3136626180479646781e-08
+Body 6726 too close to central mass -> removed
+Reached timestep 2496000000 with 245 bodies, 0 test particles. Total Energy: -3.3136629827084413156e-08
+Body 2928 too close to central mass -> removed
+Body 5873 too close to central mass -> removed
+Reached timestep 2502000000 with 243 bodies, 0 test particles. Total Energy: -3.3136634035944415519e-08
+Collision between body 5597 and 5328 at time step 2504955693
+Collision between body 2768 and 61 at time step 2507172996
+Reached timestep 2508000000 with 241 bodies, 0 test particles. Total Energy: -3.3136638462928239643e-08
+Body 6164 too close to central mass -> removed
+Collision between body 5950 and 5118 at time step 2509183890
+Body 5842 too close to central mass -> removed
+Reached timestep 2514000000 with 238 bodies, 0 test particles. Total Energy: -3.3136643492123663675e-08
+Body 6156 too close to central mass -> removed
+Reached timestep 2520000000 with 237 bodies, 0 test particles. Total Energy: -3.3136644375620644772e-08
+Reached timestep 2526000000 with 237 bodies, 0 test particles. Total Energy: -3.3136646512679099545e-08
+Body 5158 too close to central mass -> removed
+Reached timestep 2532000000 with 236 bodies, 0 test particles. Total Energy: -3.3136649109030343826e-08
+Reached timestep 2538000000 with 236 bodies, 0 test particles. Total Energy: -3.3136654566995983193e-08
+Reached timestep 2544000000 with 236 bodies, 0 test particles. Total Energy: -3.313665107662429327e-08
+Body 6401 too close to central mass -> removed
+Reached timestep 2550000000 with 235 bodies, 0 test particles. Total Energy: -3.3136651522245964392e-08
+Body 6056 too close to central mass -> removed
+Reached timestep 2556000000 with 234 bodies, 0 test particles. Total Energy: -3.3136660057134210297e-08
+Collision between body 2768 and 5448 at time step 2556815809
+Collision between body 5446 and 1399 at time step 2558744528
+Reached timestep 2562000000 with 232 bodies, 0 test particles. Total Energy: -3.3136666014083709726e-08
+Body 6957 too close to central mass -> removed
+Body 5577 too close to central mass -> removed
+Body 6292 too close to central mass -> removed
+Body 3400 too close to central mass -> removed
+Reached timestep 2568000000 with 228 bodies, 0 test particles. Total Energy: -3.3136670864087917486e-08
+Collision between body 4189 and 6230 at time step 2571828070
+Reached timestep 2574000000 with 227 bodies, 0 test particles. Total Energy: -3.3136674764474217038e-08
+Reached timestep 2580000000 with 227 bodies, 0 test particles. Total Energy: -3.3136675770258132206e-08
+Body 6526 too close to central mass -> removed
+Reached timestep 2586000000 with 226 bodies, 0 test particles. Total Energy: -3.313668241909085096e-08
+Body 5256 too close to central mass -> removed
+Reached timestep 2592000000 with 225 bodies, 0 test particles. Total Energy: -3.313668356097335988e-08
+Reached timestep 2598000000 with 225 bodies, 0 test particles. Total Energy: -3.3136687384422306875e-08
+Body 5215 ejected
+Reached timestep 2604000000 with 224 bodies, 0 test particles. Total Energy: -3.3136691002898856076e-08
+Reached timestep 2610000000 with 224 bodies, 0 test particles. Total Energy: -3.3136697330682317959e-08
+Reached timestep 2616000000 with 224 bodies, 0 test particles. Total Energy: -3.3136700127042618277e-08
+Reached timestep 2622000000 with 224 bodies, 0 test particles. Total Energy: -3.3136705091130272483e-08
+Body 2413 too close to central mass -> removed
+Reached timestep 2628000000 with 223 bodies, 0 test particles. Total Energy: -3.313670645466024699e-08
+Body 5931 too close to central mass -> removed
+Reached timestep 2634000000 with 222 bodies, 0 test particles. Total Energy: -3.3136711425903509803e-08
+Body 733 too close to central mass -> removed
+Body 5815 too close to central mass -> removed
+Body 6761 too close to central mass -> removed
+Body 5921 too close to central mass -> removed
+Reached timestep 2640000000 with 218 bodies, 0 test particles. Total Energy: -3.3136713737359417735e-08
+Body 6752 too close to central mass -> removed
+Body 5178 too close to central mass -> removed
+Body 5669 too close to central mass -> removed
+Body 6270 too close to central mass -> removed
+Reached timestep 2646000000 with 214 bodies, 0 test particles. Total Energy: -3.3136713996462951565e-08
+Reached timestep 2652000000 with 214 bodies, 0 test particles. Total Energy: -3.3136715453171824374e-08
+Reached timestep 2658000000 with 214 bodies, 0 test particles. Total Energy: -3.3136717131223138264e-08
+Body 5459 ejected
+Body 5478 too close to central mass -> removed
+Reached timestep 2664000000 with 212 bodies, 0 test particles. Total Energy: -3.3136718655726073098e-08
+Body 5048 too close to central mass -> removed
+Body 5855 too close to central mass -> removed
+Reached timestep 2670000000 with 210 bodies, 0 test particles. Total Energy: -3.313671896817161266e-08
+Reached timestep 2676000000 with 210 bodies, 0 test particles. Total Energy: -3.3136719338692431004e-08
+Body 5569 too close to central mass -> removed
+Reached timestep 2682000000 with 209 bodies, 0 test particles. Total Energy: -3.3136720364579713646e-08
+Reached timestep 2688000000 with 209 bodies, 0 test particles. Total Energy: -3.3136723373319006814e-08
+Reached timestep 2694000000 with 209 bodies, 0 test particles. Total Energy: -3.3136727407000948982e-08
+Reached timestep 2700000000 with 209 bodies, 0 test particles. Total Energy: -3.313673216334005491e-08
+Body 5861 too close to central mass -> removed
+Collision between body 4189 and 5289 at time step 2704989620
+Reached timestep 2706000000 with 207 bodies, 0 test particles. Total Energy: -3.313673475655656922e-08
+Reached timestep 2712000000 with 207 bodies, 0 test particles. Total Energy: -3.3136738641425979567e-08
+Reached timestep 2718000000 with 207 bodies, 0 test particles. Total Energy: -3.3136741623511428904e-08
+Body 1810 too close to central mass -> removed
+Reached timestep 2724000000 with 206 bodies, 0 test particles. Total Energy: -3.3136744782981406324e-08
+Reached timestep 2730000000 with 206 bodies, 0 test particles. Total Energy: -3.3136746895161146859e-08
+Reached timestep 2736000000 with 206 bodies, 0 test particles. Total Energy: -3.3136747063827396427e-08
+Body 4786 too close to central mass -> removed
+Reached timestep 2742000000 with 205 bodies, 0 test particles. Total Energy: -3.3136750400211143517e-08
+Reached timestep 2748000000 with 205 bodies, 0 test particles. Total Energy: -3.3136753021412422029e-08
+Body 6001 too close to central mass -> removed
+Reached timestep 2754000000 with 204 bodies, 0 test particles. Total Energy: -3.3136753731915801197e-08
+Reached timestep 2760000000 with 204 bodies, 0 test particles. Total Energy: -3.3136756189470023132e-08
+Collision between body 4189 and 6719 at time step 2760522418
+Body 6732 too close to central mass -> removed
+Reached timestep 2766000000 with 202 bodies, 0 test particles. Total Energy: -3.3136758569410470526e-08
+Reached timestep 2772000000 with 202 bodies, 0 test particles. Total Energy: -3.3136761139132560663e-08
+Reached timestep 2778000000 with 202 bodies, 0 test particles. Total Energy: -3.3136764109719464948e-08
+Reached timestep 2784000000 with 202 bodies, 0 test particles. Total Energy: -3.3136766515407411068e-08
+Reached timestep 2790000000 with 202 bodies, 0 test particles. Total Energy: -3.3136768709631484176e-08
+Reached timestep 2796000000 with 202 bodies, 0 test particles. Total Energy: -3.3136771248777683385e-08
+Reached timestep 2802000000 with 202 bodies, 0 test particles. Total Energy: -3.3136772257970767199e-08
+Body 1517 too close to central mass -> removed
+Body 6023 too close to central mass -> removed
+Reached timestep 2808000000 with 200 bodies, 0 test particles. Total Energy: -3.3136773863107638723e-08
+Body 6040 too close to central mass -> removed
+Reached timestep 2814000000 with 199 bodies, 0 test particles. Total Energy: -3.3136775901993135259e-08
+Reached timestep 2820000000 with 199 bodies, 0 test particles. Total Energy: -3.3136778198540727306e-08
+Reached timestep 2826000000 with 199 bodies, 0 test particles. Total Energy: -3.3136781111823715275e-08
+Body 6005 too close to central mass -> removed
+Reached timestep 2832000000 with 198 bodies, 0 test particles. Total Energy: -3.3136782436188580367e-08
+Collision between body 4189 and 6237 at time step 2833895868
+Reached timestep 2838000000 with 197 bodies, 0 test particles. Total Energy: -3.3136783312855173805e-08
+Reached timestep 2844000000 with 197 bodies, 0 test particles. Total Energy: -3.3136785196627093512e-08
+Reached timestep 2850000000 with 197 bodies, 0 test particles. Total Energy: -3.3136785982575862729e-08
+Body 5002 too close to central mass -> removed
+Reached timestep 2856000000 with 196 bodies, 0 test particles. Total Energy: -3.3136786347414863471e-08
+Reached timestep 2862000000 with 196 bodies, 0 test particles. Total Energy: -3.3136787144230138959e-08
+Body 5480 too close to central mass -> removed
+Reached timestep 2868000000 with 195 bodies, 0 test particles. Total Energy: -3.3136790843713259789e-08
+Reached timestep 2874000000 with 195 bodies, 0 test particles. Total Energy: -3.3136793698757379121e-08
+Reached timestep 2880000000 with 195 bodies, 0 test particles. Total Energy: -3.3136794265775851949e-08
+Collision between body 4189 and 5788 at time step 2881050223
+Reached timestep 2886000000 with 194 bodies, 0 test particles. Total Energy: -3.3136798410000305354e-08
+Body 5479 too close to central mass -> removed
+Reached timestep 2892000000 with 193 bodies, 0 test particles. Total Energy: -3.3136800390100848466e-08
+Reached timestep 2898000000 with 193 bodies, 0 test particles. Total Energy: -3.313680253531206153e-08
+Reached timestep 2904000000 with 193 bodies, 0 test particles. Total Energy: -3.3136802775907793113e-08
+Body 5138 too close to central mass -> removed
+Reached timestep 2910000000 with 192 bodies, 0 test particles. Total Energy: -3.3136805467401391154e-08
+Body 6225 too close to central mass -> removed
+Body 5647 too close to central mass -> removed
+Reached timestep 2916000000 with 190 bodies, 0 test particles. Total Energy: -3.3136808708821402557e-08
+Body 5093 too close to central mass -> removed
+Reached timestep 2922000000 with 189 bodies, 0 test particles. Total Energy: -3.3136809940071862965e-08
+Reached timestep 2928000000 with 189 bodies, 0 test particles. Total Energy: -3.3136812787191949372e-08
+Reached timestep 2934000000 with 189 bodies, 0 test particles. Total Energy: -3.313681546552779055e-08
+Reached timestep 2940000000 with 189 bodies, 0 test particles. Total Energy: -3.3136817526887896826e-08
+Body 6823 too close to central mass -> removed
+Reached timestep 2946000000 with 188 bodies, 0 test particles. Total Energy: -3.3136818965470482939e-08
+Reached timestep 2952000000 with 188 bodies, 0 test particles. Total Energy: -3.3136821772392470163e-08
+Reached timestep 2958000000 with 188 bodies, 0 test particles. Total Energy: -3.313682314153350855e-08
+Reached timestep 2964000000 with 188 bodies, 0 test particles. Total Energy: -3.3136826961679761587e-08
+Reached timestep 2970000000 with 188 bodies, 0 test particles. Total Energy: -3.3136830925791638631e-08
+Body 6155 too close to central mass -> removed
+Body 5597 too close to central mass -> removed
+Reached timestep 2976000000 with 186 bodies, 0 test particles. Total Energy: -3.313683170969658352e-08
+Reached timestep 2982000000 with 186 bodies, 0 test particles. Total Energy: -3.3136833923591276293e-08
+Body 6450 too close to central mass -> removed
+Reached timestep 2988000000 with 185 bodies, 0 test particles. Total Energy: -3.3136841539786032506e-08
+Body 5540 too close to central mass -> removed
+Reached timestep 2994000000 with 184 bodies, 0 test particles. Total Energy: -3.3136843585845415032e-08
+Reached timestep 3000000000 with 184 bodies, 0 test particles. Total Energy: -3.3136846942510816796e-08
+Body 5204 too close to central mass -> removed
+Body 6557 too close to central mass -> removed
+Reached timestep 3006000000 with 182 bodies, 0 test particles. Total Energy: -3.3136849231106159132e-08
+Reached timestep 3012000000 with 182 bodies, 0 test particles. Total Energy: -3.3136851435054514582e-08
+Reached timestep 3018000000 with 182 bodies, 0 test particles. Total Energy: -3.3136852760270052215e-08
+Reached timestep 3024000000 with 182 bodies, 0 test particles. Total Energy: -3.3136856869904201301e-08
+Reached timestep 3030000000 with 182 bodies, 0 test particles. Total Energy: -3.3136861645289392297e-08
+Reached timestep 3036000000 with 182 bodies, 0 test particles. Total Energy: -3.3136861581946256798e-08
+Reached timestep 3042000000 with 182 bodies, 0 test particles. Total Energy: -3.3136862080347523628e-08
+Reached timestep 3048000000 with 182 bodies, 0 test particles. Total Energy: -3.3136866354355417386e-08
+Reached timestep 3054000000 with 182 bodies, 0 test particles. Total Energy: -3.3136870788098180617e-08
+Reached timestep 3060000000 with 182 bodies, 0 test particles. Total Energy: -3.3136872246159956949e-08
+Reached timestep 3066000000 with 182 bodies, 0 test particles. Total Energy: -3.3136874818169274271e-08
+Reached timestep 3072000000 with 182 bodies, 0 test particles. Total Energy: -3.3136876677950044539e-08
+Reached timestep 3078000000 with 182 bodies, 0 test particles. Total Energy: -3.3136879508082726369e-08
+Reached timestep 3084000000 with 182 bodies, 0 test particles. Total Energy: -3.3136883466196399155e-08
+Body 4406 too close to central mass -> removed
+Reached timestep 3090000000 with 181 bodies, 0 test particles. Total Energy: -3.3136886720059483371e-08
+Reached timestep 3096000000 with 181 bodies, 0 test particles. Total Energy: -3.3136891661530067484e-08
+Reached timestep 3102000000 with 181 bodies, 0 test particles. Total Energy: -3.3136894550645934918e-08
+Reached timestep 3108000000 with 181 bodies, 0 test particles. Total Energy: -3.3136896634388979469e-08
+Reached timestep 3114000000 with 181 bodies, 0 test particles. Total Energy: -3.3136899488199262965e-08
+Body 5673 too close to central mass -> removed
+Reached timestep 3120000000 with 180 bodies, 0 test particles. Total Energy: -3.3136903091641083232e-08
+Reached timestep 3126000000 with 180 bodies, 0 test particles. Total Energy: -3.3136902650146017662e-08
+Reached timestep 3132000000 with 180 bodies, 0 test particles. Total Energy: -3.3136906155523313145e-08
+Reached timestep 3138000000 with 180 bodies, 0 test particles. Total Energy: -3.3136911092057706878e-08
+Reached timestep 3144000000 with 180 bodies, 0 test particles. Total Energy: -3.3136911846070475247e-08
+Body 5964 too close to central mass -> removed
+Reached timestep 3150000000 with 179 bodies, 0 test particles. Total Energy: -3.3136913040080913754e-08
+Body 6161 too close to central mass -> removed
+Body 5394 too close to central mass -> removed
+Reached timestep 3156000000 with 177 bodies, 0 test particles. Total Energy: -3.3136914486055655659e-08
+Reached timestep 3162000000 with 177 bodies, 0 test particles. Total Energy: -3.3136915354650885377e-08
+Reached timestep 3168000000 with 177 bodies, 0 test particles. Total Energy: -3.3136917902672778881e-08
+Reached timestep 3174000000 with 177 bodies, 0 test particles. Total Energy: -3.3136919268639587767e-08
+Reached timestep 3180000000 with 177 bodies, 0 test particles. Total Energy: -3.3136922296245289139e-08
+Reached timestep 3186000000 with 177 bodies, 0 test particles. Total Energy: -3.3136923389781347804e-08
+Reached timestep 3192000000 with 177 bodies, 0 test particles. Total Energy: -3.3136926662855119412e-08
+Reached timestep 3198000000 with 177 bodies, 0 test particles. Total Energy: -3.3136928917150398562e-08
+Body 6473 too close to central mass -> removed
+Reached timestep 3204000000 with 176 bodies, 0 test particles. Total Energy: -3.313692979661519181e-08
+Reached timestep 3210000000 with 176 bodies, 0 test particles. Total Energy: -3.3136932576906787428e-08
+Body 6809 too close to central mass -> removed
+Reached timestep 3216000000 with 175 bodies, 0 test particles. Total Energy: -3.3136934400180457522e-08
+Reached timestep 3222000000 with 175 bodies, 0 test particles. Total Energy: -3.3136936683023625583e-08
+Reached timestep 3228000000 with 175 bodies, 0 test particles. Total Energy: -3.3136939175316548039e-08
+Reached timestep 3234000000 with 175 bodies, 0 test particles. Total Energy: -3.3136940830492201941e-08
+Body 5437 too close to central mass -> removed
+Collision between body 4189 and 3089 at time step 3239437502
+Reached timestep 3240000000 with 173 bodies, 0 test particles. Total Energy: -3.3136944991308872731e-08
+Body 5227 too close to central mass -> removed
+Body 5708 ejected
+Reached timestep 3246000000 with 171 bodies, 0 test particles. Total Energy: -3.3136946762246798998e-08
+Collision between body 4755 and 6655 at time step 3249895503
+Reached timestep 3252000000 with 170 bodies, 0 test particles. Total Energy: -3.3136947997614269664e-08
+Reached timestep 3258000000 with 170 bodies, 0 test particles. Total Energy: -3.313694856271741571e-08
+Reached timestep 3264000000 with 170 bodies, 0 test particles. Total Energy: -3.3136948708484387629e-08
+Reached timestep 3270000000 with 170 bodies, 0 test particles. Total Energy: -3.3136952110652584608e-08
+Reached timestep 3276000000 with 170 bodies, 0 test particles. Total Energy: -3.3136957061687586829e-08
+Reached timestep 3282000000 with 170 bodies, 0 test particles. Total Energy: -3.3136957668098974612e-08
+Reached timestep 3288000000 with 170 bodies, 0 test particles. Total Energy: -3.3136960556238550548e-08
+Body 5740 too close to central mass -> removed
+Reached timestep 3294000000 with 169 bodies, 0 test particles. Total Energy: -3.3136962847943026579e-08
+Reached timestep 3300000000 with 169 bodies, 0 test particles. Total Energy: -3.3136964738003325505e-08
+Reached timestep 3306000000 with 169 bodies, 0 test particles. Total Energy: -3.3136966543894569267e-08
+Reached timestep 3312000000 with 169 bodies, 0 test particles. Total Energy: -3.3136968173622693221e-08
+Reached timestep 3318000000 with 169 bodies, 0 test particles. Total Energy: -3.313697038599313697e-08
+Body 6413 ejected
+Reached timestep 3324000000 with 168 bodies, 0 test particles. Total Energy: -3.3136971855994788987e-08
+Reached timestep 3330000000 with 168 bodies, 0 test particles. Total Energy: -3.3136972553373716892e-08
+Reached timestep 3336000000 with 168 bodies, 0 test particles. Total Energy: -3.3136974386995178221e-08
+Reached timestep 3342000000 with 168 bodies, 0 test particles. Total Energy: -3.3136974221162756788e-08
+Reached timestep 3348000000 with 168 bodies, 0 test particles. Total Energy: -3.313697781444079711e-08
+Reached timestep 3354000000 with 168 bodies, 0 test particles. Total Energy: -3.3136982439097375115e-08
+Reached timestep 3360000000 with 168 bodies, 0 test particles. Total Energy: -3.3136982355602141278e-08
+Reached timestep 3366000000 with 168 bodies, 0 test particles. Total Energy: -3.3136984168985398076e-08
+Body 5291 too close to central mass -> removed
+Reached timestep 3372000000 with 167 bodies, 0 test particles. Total Energy: -3.313698773997871624e-08
+Body 6286 too close to central mass -> removed
+Reached timestep 3378000000 with 166 bodies, 0 test particles. Total Energy: -3.3136989766783279634e-08
+Reached timestep 3384000000 with 166 bodies, 0 test particles. Total Energy: -3.3136990823381164529e-08
+Reached timestep 3390000000 with 166 bodies, 0 test particles. Total Energy: -3.3136997471625499787e-08
+Body 6793 too close to central mass -> removed
+Reached timestep 3396000000 with 165 bodies, 0 test particles. Total Energy: -3.3137001097889709611e-08
+Reached timestep 3402000000 with 165 bodies, 0 test particles. Total Energy: -3.3137004547634251695e-08
+Reached timestep 3408000000 with 165 bodies, 0 test particles. Total Energy: -3.313700692860809252e-08
+Reached timestep 3414000000 with 165 bodies, 0 test particles. Total Energy: -3.3137012488648461368e-08
+Collision between body 6390 and 5310 at time step 3418525158
+Reached timestep 3420000000 with 164 bodies, 0 test particles. Total Energy: -3.3137015086654126431e-08
+Reached timestep 3426000000 with 164 bodies, 0 test particles. Total Energy: -3.313701913509192517e-08
+Reached timestep 3432000000 with 164 bodies, 0 test particles. Total Energy: -3.313702810291157473e-08
+Reached timestep 3438000000 with 164 bodies, 0 test particles. Total Energy: -3.3137032713509080023e-08
+Reached timestep 3444000000 with 164 bodies, 0 test particles. Total Energy: -3.3137036643022923573e-08
+Reached timestep 3450000000 with 164 bodies, 0 test particles. Total Energy: -3.3137039134828504299e-08
+Reached timestep 3456000000 with 164 bodies, 0 test particles. Total Energy: -3.3137041699843533086e-08
+Reached timestep 3462000000 with 164 bodies, 0 test particles. Total Energy: -3.3137044903463865419e-08
+Body 6171 too close to central mass -> removed
+Reached timestep 3468000000 with 163 bodies, 0 test particles. Total Energy: -3.3137046617121850373e-08
+Body 5176 ejected
+Reached timestep 3474000000 with 162 bodies, 0 test particles. Total Energy: -3.3137048345341191959e-08
+Reached timestep 3480000000 with 162 bodies, 0 test particles. Total Energy: -3.313705014816454856e-08
+Collision between body 2768 and 6451 at time step 3485277588
+Reached timestep 3486000000 with 161 bodies, 0 test particles. Total Energy: -3.3137051418692158344e-08
+Reached timestep 3492000000 with 161 bodies, 0 test particles. Total Energy: -3.3137051771941816074e-08
+Reached timestep 3498000000 with 161 bodies, 0 test particles. Total Energy: -3.3137054905514396406e-08
+Reached timestep 3504000000 with 161 bodies, 0 test particles. Total Energy: -3.3137057412413760145e-08
+Body 4502 too close to central mass -> removed
+Body 2010 too close to central mass -> removed
+Reached timestep 3510000000 with 159 bodies, 0 test particles. Total Energy: -3.3137058094973773846e-08
+Reached timestep 3516000000 with 159 bodies, 0 test particles. Total Energy: -3.3137060495327477041e-08
+Reached timestep 3522000000 with 159 bodies, 0 test particles. Total Energy: -3.3137061222825288512e-08
+Reached timestep 3528000000 with 159 bodies, 0 test particles. Total Energy: -3.3137067947570244817e-08
+Reached timestep 3534000000 with 159 bodies, 0 test particles. Total Energy: -3.3137068177753453319e-08
+Reached timestep 3540000000 with 159 bodies, 0 test particles. Total Energy: -3.3137069399727844164e-08
+Reached timestep 3546000000 with 159 bodies, 0 test particles. Total Energy: -3.3137070015598684144e-08
+Body 5360 too close to central mass -> removed
+Reached timestep 3552000000 with 158 bodies, 0 test particles. Total Energy: -3.3137071577108911961e-08
+Reached timestep 3558000000 with 158 bodies, 0 test particles. Total Energy: -3.3137071951661435079e-08
+Reached timestep 3564000000 with 158 bodies, 0 test particles. Total Energy: -3.313707205896747313e-08
+Body 6129 too close to central mass -> removed
+Reached timestep 3570000000 with 157 bodies, 0 test particles. Total Energy: -3.3137073439460222083e-08
+Reached timestep 3576000000 with 157 bodies, 0 test particles. Total Energy: -3.313707427565327843e-08
+Reached timestep 3582000000 with 157 bodies, 0 test particles. Total Energy: -3.3137075353797094082e-08
+Reached timestep 3588000000 with 157 bodies, 0 test particles. Total Energy: -3.3137074869297762116e-08
+Body 5481 too close to central mass -> removed
+Reached timestep 3594000000 with 156 bodies, 0 test particles. Total Energy: -3.3137075709053961817e-08
+Body 6417 too close to central mass -> removed
+Reached timestep 3600000000 with 155 bodies, 0 test particles. Total Energy: -3.3137076024087471583e-08
+Body 5888 too close to central mass -> removed
+Reached timestep 3606000000 with 154 bodies, 0 test particles. Total Energy: -3.3137077740021275248e-08
+Reached timestep 3612000000 with 154 bodies, 0 test particles. Total Energy: -3.3137079058598767875e-08
+Reached timestep 3618000000 with 154 bodies, 0 test particles. Total Energy: -3.3137079419904456705e-08
+Reached timestep 3624000000 with 154 bodies, 0 test particles. Total Energy: -3.3137079466838261145e-08
+Body 5020 too close to central mass -> removed
+Reached timestep 3630000000 with 153 bodies, 0 test particles. Total Energy: -3.313708033262436565e-08
+Collision between body 4189 and 753 at time step 3631907211
+Reached timestep 3636000000 with 152 bodies, 0 test particles. Total Energy: -3.3137081420269852798e-08
+Reached timestep 3642000000 with 152 bodies, 0 test particles. Total Energy: -3.3137082447406872996e-08
+Reached timestep 3648000000 with 152 bodies, 0 test particles. Total Energy: -3.3137084065376869388e-08
+Reached timestep 3654000000 with 152 bodies, 0 test particles. Total Energy: -3.3137084629681448653e-08
+Reached timestep 3660000000 with 152 bodies, 0 test particles. Total Energy: -3.313708564072803908e-08
+Reached timestep 3666000000 with 152 bodies, 0 test particles. Total Energy: -3.3137088013768152421e-08
+Reached timestep 3672000000 with 152 bodies, 0 test particles. Total Energy: -3.3137089621674914326e-08
+Reached timestep 3678000000 with 152 bodies, 0 test particles. Total Energy: -3.3137090416084814767e-08
+Reached timestep 3684000000 with 152 bodies, 0 test particles. Total Energy: -3.3137091310440162678e-08
+Reached timestep 3690000000 with 152 bodies, 0 test particles. Total Energy: -3.3137092107234838059e-08
+Reached timestep 3696000000 with 152 bodies, 0 test particles. Total Energy: -3.3137093761884398474e-08
+Reached timestep 3702000000 with 152 bodies, 0 test particles. Total Energy: -3.3137094087513635284e-08
+Collision between body 6832 and 6291 at time step 3707094363
+Reached timestep 3708000000 with 151 bodies, 0 test particles. Total Energy: -3.3137095137731866543e-08
+Reached timestep 3714000000 with 151 bodies, 0 test particles. Total Energy: -3.3137096626772119298e-08
+Collision between body 6832 and 6914 at time step 3716307285
+Reached timestep 3720000000 with 150 bodies, 0 test particles. Total Energy: -3.3137097002144298994e-08
+Reached timestep 3726000000 with 150 bodies, 0 test particles. Total Energy: -3.3137099275047442775e-08
+Reached timestep 3732000000 with 150 bodies, 0 test particles. Total Energy: -3.3137099392097271395e-08
+Reached timestep 3738000000 with 150 bodies, 0 test particles. Total Energy: -3.3137100028328983482e-08
+Body 5288 too close to central mass -> removed
+Reached timestep 3744000000 with 149 bodies, 0 test particles. Total Energy: -3.3137101450542426279e-08
+Body 5316 too close to central mass -> removed
+Reached timestep 3750000000 with 148 bodies, 0 test particles. Total Energy: -3.3137102594411505393e-08
+Collision between body 519 and 6886 at time step 3752299624
+Reached timestep 3756000000 with 147 bodies, 0 test particles. Total Energy: -3.3137103188735713167e-08
+Reached timestep 3762000000 with 147 bodies, 0 test particles. Total Energy: -3.3137103535627885702e-08
+Reached timestep 3768000000 with 147 bodies, 0 test particles. Total Energy: -3.3137105390540797327e-08
+Reached timestep 3774000000 with 147 bodies, 0 test particles. Total Energy: -3.3137106636842033974e-08
+Reached timestep 3780000000 with 147 bodies, 0 test particles. Total Energy: -3.3137107790468992198e-08
+Reached timestep 3786000000 with 147 bodies, 0 test particles. Total Energy: -3.3137108359042736631e-08
+Reached timestep 3792000000 with 147 bodies, 0 test particles. Total Energy: -3.3137108750049285031e-08
+Body 6028 too close to central mass -> removed
+Body 5642 ejected
+Reached timestep 3798000000 with 145 bodies, 0 test particles. Total Energy: -3.3137109526000755982e-08
+Reached timestep 3804000000 with 145 bodies, 0 test particles. Total Energy: -3.3137109332538377889e-08
+Collision between body 4189 and 5446 at time step 3804130845
+Reached timestep 3810000000 with 144 bodies, 0 test particles. Total Energy: -3.3137110180815887858e-08
+Body 5992 too close to central mass -> removed
+Reached timestep 3816000000 with 143 bodies, 0 test particles. Total Energy: -3.3137110450332857976e-08
+Reached timestep 3822000000 with 143 bodies, 0 test particles. Total Energy: -3.3137111093011079745e-08
+Reached timestep 3828000000 with 143 bodies, 0 test particles. Total Energy: -3.3137111963634152661e-08
+Reached timestep 3834000000 with 143 bodies, 0 test particles. Total Energy: -3.3137111211193702435e-08
+Reached timestep 3840000000 with 143 bodies, 0 test particles. Total Energy: -3.3137112452475885058e-08
+Reached timestep 3846000000 with 143 bodies, 0 test particles. Total Energy: -3.3137113107023030268e-08
+Reached timestep 3852000000 with 143 bodies, 0 test particles. Total Energy: -3.313711454683413841e-08
+Reached timestep 3858000000 with 143 bodies, 0 test particles. Total Energy: -3.3137118038099679703e-08
+Reached timestep 3864000000 with 143 bodies, 0 test particles. Total Energy: -3.31371179897634534e-08
+Reached timestep 3870000000 with 143 bodies, 0 test particles. Total Energy: -3.3137120122138047585e-08
+Body 6140 too close to central mass -> removed
+Reached timestep 3876000000 with 142 bodies, 0 test particles. Total Energy: -3.313711979036659768e-08
+Body 6521 too close to central mass -> removed
+Body 6333 too close to central mass -> removed
+Reached timestep 3882000000 with 140 bodies, 0 test particles. Total Energy: -3.313712138144028706e-08
+Reached timestep 3888000000 with 140 bodies, 0 test particles. Total Energy: -3.3137120863716954623e-08
+Collision between body 4189 and 6832 at time step 3890226595
+Reached timestep 3894000000 with 139 bodies, 0 test particles. Total Energy: -3.313712167907744739e-08
+Reached timestep 3900000000 with 139 bodies, 0 test particles. Total Energy: -3.3137122748589216451e-08
+Reached timestep 3906000000 with 139 bodies, 0 test particles. Total Energy: -3.3137123706001746832e-08
+Reached timestep 3912000000 with 139 bodies, 0 test particles. Total Energy: -3.3137124307424633335e-08
+Body 5588 ejected
+Reached timestep 3918000000 with 138 bodies, 0 test particles. Total Energy: -3.3137125381673229013e-08
+Reached timestep 3924000000 with 138 bodies, 0 test particles. Total Energy: -3.3137125951454015248e-08
+Body 5030 too close to central mass -> removed
+Reached timestep 3930000000 with 137 bodies, 0 test particles. Total Energy: -3.3137126747788970115e-08
+Reached timestep 3936000000 with 137 bodies, 0 test particles. Total Energy: -3.3137128394758118838e-08
+Reached timestep 3942000000 with 137 bodies, 0 test particles. Total Energy: -3.3137130256364761268e-08
+Reached timestep 3948000000 with 137 bodies, 0 test particles. Total Energy: -3.313713182259697939e-08
+Reached timestep 3954000000 with 137 bodies, 0 test particles. Total Energy: -3.3137132311776320591e-08
+Reached timestep 3960000000 with 137 bodies, 0 test particles. Total Energy: -3.3137133689842637787e-08
+Reached timestep 3966000000 with 137 bodies, 0 test particles. Total Energy: -3.3137135077723512509e-08
+Reached timestep 3972000000 with 137 bodies, 0 test particles. Total Energy: -3.3137136408335377935e-08
+Reached timestep 3978000000 with 137 bodies, 0 test particles. Total Energy: -3.3137138734923939752e-08
+Reached timestep 3984000000 with 137 bodies, 0 test particles. Total Energy: -3.3137141108660572257e-08
+Reached timestep 3990000000 with 137 bodies, 0 test particles. Total Energy: -3.3137141397188859386e-08
+Reached timestep 3996000000 with 137 bodies, 0 test particles. Total Energy: -3.3137143010362200842e-08
+Reached timestep 4002000000 with 137 bodies, 0 test particles. Total Energy: -3.3137143811226068824e-08
+Reached timestep 4008000000 with 137 bodies, 0 test particles. Total Energy: -3.3137145873831465733e-08
+Reached timestep 4014000000 with 137 bodies, 0 test particles. Total Energy: -3.3137147008650461027e-08
+Reached timestep 4020000000 with 137 bodies, 0 test particles. Total Energy: -3.3137148293652745531e-08
+Reached timestep 4026000000 with 137 bodies, 0 test particles. Total Energy: -3.3137149815558657497e-08
+Body 5372 too close to central mass -> removed
+Reached timestep 4032000000 with 136 bodies, 0 test particles. Total Energy: -3.3137151561822811796e-08
+Reached timestep 4038000000 with 136 bodies, 0 test particles. Total Energy: -3.3137152959004425916e-08
+Reached timestep 4044000000 with 136 bodies, 0 test particles. Total Energy: -3.3137153738070655389e-08
+Body 6639 too close to central mass -> removed
+Reached timestep 4050000000 with 135 bodies, 0 test particles. Total Energy: -3.3137155811970971952e-08
+Reached timestep 4056000000 with 135 bodies, 0 test particles. Total Energy: -3.313715725381544224e-08
+Reached timestep 4062000000 with 135 bodies, 0 test particles. Total Energy: -3.3137157586477117154e-08
+Reached timestep 4068000000 with 135 bodies, 0 test particles. Total Energy: -3.3137158366729834646e-08
+Reached timestep 4074000000 with 135 bodies, 0 test particles. Total Energy: -3.3137158602011433719e-08
+Reached timestep 4080000000 with 135 bodies, 0 test particles. Total Energy: -3.3137158276641422079e-08
+Reached timestep 4086000000 with 135 bodies, 0 test particles. Total Energy: -3.3137160655492558633e-08
+Reached timestep 4092000000 with 135 bodies, 0 test particles. Total Energy: -3.3137161812258885657e-08
+Reached timestep 4098000000 with 135 bodies, 0 test particles. Total Energy: -3.3137164375938176574e-08
+Reached timestep 4104000000 with 135 bodies, 0 test particles. Total Energy: -3.3137164616119040684e-08
+Reached timestep 4110000000 with 135 bodies, 0 test particles. Total Energy: -3.3137165497143883332e-08
+Collision between body 6425 and 6702 at time step 4114935559
+Reached timestep 4116000000 with 134 bodies, 0 test particles. Total Energy: -3.313716853912023319e-08
+Reached timestep 4122000000 with 134 bodies, 0 test particles. Total Energy: -3.3137169232007974033e-08
+Reached timestep 4128000000 with 134 bodies, 0 test particles. Total Energy: -3.3137171140201633703e-08
+Body 6211 too close to central mass -> removed
+Reached timestep 4134000000 with 133 bodies, 0 test particles. Total Energy: -3.3137172425292320653e-08
+Reached timestep 4140000000 with 133 bodies, 0 test particles. Total Energy: -3.3137171827665385834e-08
+Reached timestep 4146000000 with 133 bodies, 0 test particles. Total Energy: -3.3137173504631160828e-08
+Body 6815 too close to central mass -> removed
+Reached timestep 4152000000 with 132 bodies, 0 test particles. Total Energy: -3.3137174601949671589e-08
+Reached timestep 4158000000 with 132 bodies, 0 test particles. Total Energy: -3.3137174233717337746e-08
+Reached timestep 4164000000 with 132 bodies, 0 test particles. Total Energy: -3.313717460926384741e-08
+Body 519 too close to central mass -> removed
+Reached timestep 4170000000 with 131 bodies, 0 test particles. Total Energy: -3.313717600436624049e-08
+Body 5667 too close to central mass -> removed
+Reached timestep 4176000000 with 130 bodies, 0 test particles. Total Energy: -3.3137177388538493948e-08
+Reached timestep 4182000000 with 130 bodies, 0 test particles. Total Energy: -3.3137180531480085858e-08
+Reached timestep 4188000000 with 130 bodies, 0 test particles. Total Energy: -3.3137183262631872369e-08
+Reached timestep 4194000000 with 130 bodies, 0 test particles. Total Energy: -3.3137182217479851046e-08
+Reached timestep 4200000000 with 130 bodies, 0 test particles. Total Energy: -3.3137183729142567111e-08
+Body 6692 too close to central mass -> removed
+Body 5640 too close to central mass -> removed
+Reached timestep 4206000000 with 128 bodies, 0 test particles. Total Energy: -3.3137184965529527956e-08
+Reached timestep 4212000000 with 128 bodies, 0 test particles. Total Energy: -3.3137186658866530761e-08
+Reached timestep 4218000000 with 128 bodies, 0 test particles. Total Energy: -3.3137186724985988798e-08
+Reached timestep 4224000000 with 128 bodies, 0 test particles. Total Energy: -3.3137188141649969509e-08
+Reached timestep 4230000000 with 128 bodies, 0 test particles. Total Energy: -3.3137187750174522198e-08
+Reached timestep 4236000000 with 128 bodies, 0 test particles. Total Energy: -3.3137187713690444114e-08
+Reached timestep 4242000000 with 128 bodies, 0 test particles. Total Energy: -3.3137188499673425521e-08
+Body 5492 too close to central mass -> removed
+Body 5938 too close to central mass -> removed
+Reached timestep 4248000000 with 126 bodies, 0 test particles. Total Energy: -3.3137190024049715695e-08
+Reached timestep 4254000000 with 126 bodies, 0 test particles. Total Energy: -3.3137191803254623971e-08
+Reached timestep 4260000000 with 126 bodies, 0 test particles. Total Energy: -3.3137192661473051576e-08
+Reached timestep 4266000000 with 126 bodies, 0 test particles. Total Energy: -3.3137195499117817152e-08
+Reached timestep 4272000000 with 126 bodies, 0 test particles. Total Energy: -3.3137196306066895559e-08
+Reached timestep 4278000000 with 126 bodies, 0 test particles. Total Energy: -3.3137196232054003661e-08
+Reached timestep 4284000000 with 126 bodies, 0 test particles. Total Energy: -3.3137199236922475374e-08
+Reached timestep 4290000000 with 126 bodies, 0 test particles. Total Energy: -3.3137200804129092405e-08
+Reached timestep 4296000000 with 126 bodies, 0 test particles. Total Energy: -3.3137202734995660169e-08
+Reached timestep 4302000000 with 126 bodies, 0 test particles. Total Energy: -3.3137207065290726303e-08
+Reached timestep 4308000000 with 126 bodies, 0 test particles. Total Energy: -3.3137209292351388188e-08
+Reached timestep 4314000000 with 126 bodies, 0 test particles. Total Energy: -3.3137208688232164204e-08
+Reached timestep 4320000000 with 126 bodies, 0 test particles. Total Energy: -3.3137211939498999792e-08
+Reached timestep 4326000000 with 126 bodies, 0 test particles. Total Energy: -3.3137214590420440962e-08
+Body 5559 too close to central mass -> removed
+Reached timestep 4332000000 with 125 bodies, 0 test particles. Total Energy: -3.3137216405598567193e-08
+Reached timestep 4338000000 with 125 bodies, 0 test particles. Total Energy: -3.3137219023438276339e-08
+Body 5160 too close to central mass -> removed
+Reached timestep 4344000000 with 124 bodies, 0 test particles. Total Energy: -3.3137224011918136851e-08
+Reached timestep 4350000000 with 124 bodies, 0 test particles. Total Energy: -3.3137224204917459236e-08
+Body 6425 too close to central mass -> removed
+Reached timestep 4356000000 with 123 bodies, 0 test particles. Total Energy: -3.3137225195235770398e-08
+Reached timestep 4362000000 with 123 bodies, 0 test particles. Total Energy: -3.3137225828711124778e-08
+Reached timestep 4368000000 with 123 bodies, 0 test particles. Total Energy: -3.313722847715609969e-08
+Reached timestep 4374000000 with 123 bodies, 0 test particles. Total Energy: -3.3137228639222672197e-08
+Body 6960 ejected
+Reached timestep 4380000000 with 122 bodies, 0 test particles. Total Energy: -3.3137229671868761597e-08
+Body 6883 too close to central mass -> removed
+Reached timestep 4386000000 with 121 bodies, 0 test particles. Total Energy: -3.3137232780727329279e-08
+Body 6997 too close to central mass -> removed
+Reached timestep 4392000000 with 120 bodies, 0 test particles. Total Energy: -3.3137233521388648172e-08
+Body 6104 ejected
+Reached timestep 4398000000 with 119 bodies, 0 test particles. Total Energy: -3.3137237396437101925e-08
+Reached timestep 4404000000 with 119 bodies, 0 test particles. Total Energy: -3.3137238348724732251e-08
+Reached timestep 4410000000 with 119 bodies, 0 test particles. Total Energy: -3.3137241909967007126e-08
+Body 5846 ejected
+Reached timestep 4416000000 with 118 bodies, 0 test particles. Total Energy: -3.3137241817304924654e-08
+Reached timestep 4422000000 with 118 bodies, 0 test particles. Total Energy: -3.3137244293097129137e-08
+Body 6734 too close to central mass -> removed
+Reached timestep 4428000000 with 117 bodies, 0 test particles. Total Energy: -3.3137248099392904561e-08
+Reached timestep 4434000000 with 117 bodies, 0 test particles. Total Energy: -3.3137247599756359291e-08
+Reached timestep 4440000000 with 117 bodies, 0 test particles. Total Energy: -3.3137251701062573083e-08
+Reached timestep 4446000000 with 117 bodies, 0 test particles. Total Energy: -3.3137250689817929148e-08
+Reached timestep 4452000000 with 117 bodies, 0 test particles. Total Energy: -3.3137252709192756281e-08
+Reached timestep 4458000000 with 117 bodies, 0 test particles. Total Energy: -3.3137255354676259164e-08
+Reached timestep 4464000000 with 117 bodies, 0 test particles. Total Energy: -3.3137256543031667486e-08
+Reached timestep 4470000000 with 117 bodies, 0 test particles. Total Energy: -3.3137260087426146021e-08
+Reached timestep 4476000000 with 117 bodies, 0 test particles. Total Energy: -3.3137259929482334331e-08
+Body 6722 ejected
+Reached timestep 4482000000 with 116 bodies, 0 test particles. Total Energy: -3.3137262748895086295e-08
+Reached timestep 4488000000 with 116 bodies, 0 test particles. Total Energy: -3.3137264360600479949e-08
+Reached timestep 4494000000 with 116 bodies, 0 test particles. Total Energy: -3.3137265027565379629e-08
+Reached timestep 4500000000 with 116 bodies, 0 test particles. Total Energy: -3.3137265916016352032e-08
+Reached timestep 4506000000 with 116 bodies, 0 test particles. Total Energy: -3.3137269299028184225e-08
+Reached timestep 4512000000 with 116 bodies, 0 test particles. Total Energy: -3.3137272672763702009e-08
+Reached timestep 4518000000 with 116 bodies, 0 test particles. Total Energy: -3.3137275672878922608e-08
+Reached timestep 4524000000 with 116 bodies, 0 test particles. Total Energy: -3.3137278947889183586e-08
+Collision between body 3800 and 6390 at time step 4528869455
+Reached timestep 4530000000 with 115 bodies, 0 test particles. Total Energy: -3.3137281005935286691e-08
+Reached timestep 4536000000 with 115 bodies, 0 test particles. Total Energy: -3.3137283494976125407e-08
+Body 6089 too close to central mass -> removed
+Reached timestep 4542000000 with 114 bodies, 0 test particles. Total Energy: -3.3137286463790633103e-08
+Reached timestep 4548000000 with 114 bodies, 0 test particles. Total Energy: -3.3137288682088983994e-08
+Reached timestep 4554000000 with 114 bodies, 0 test particles. Total Energy: -3.3137290088581210739e-08
+Reached timestep 4560000000 with 114 bodies, 0 test particles. Total Energy: -3.3137289271800614296e-08
+Reached timestep 4566000000 with 114 bodies, 0 test particles. Total Energy: -3.3137289742546189224e-08
+Reached timestep 4572000000 with 114 bodies, 0 test particles. Total Energy: -3.3137291910504538262e-08
+Reached timestep 4578000000 with 114 bodies, 0 test particles. Total Energy: -3.3137290121684939149e-08
+Reached timestep 4584000000 with 114 bodies, 0 test particles. Total Energy: -3.3137293058151993125e-08
+Reached timestep 4590000000 with 114 bodies, 0 test particles. Total Energy: -3.3137293191199666846e-08
+Reached timestep 4596000000 with 114 bodies, 0 test particles. Total Energy: -3.3137294929739489471e-08
+Reached timestep 4602000000 with 114 bodies, 0 test particles. Total Energy: -3.3137295479673671712e-08
+Reached timestep 4608000000 with 114 bodies, 0 test particles. Total Energy: -3.313729730213501074e-08
+Reached timestep 4614000000 with 114 bodies, 0 test particles. Total Energy: -3.3137300832008313769e-08
+Reached timestep 4620000000 with 114 bodies, 0 test particles. Total Energy: -3.3137303241082518941e-08
+Reached timestep 4626000000 with 114 bodies, 0 test particles. Total Energy: -3.3137306372565607958e-08
+Reached timestep 4632000000 with 114 bodies, 0 test particles. Total Energy: -3.3137306110105037713e-08
+Reached timestep 4638000000 with 114 bodies, 0 test particles. Total Energy: -3.3137306764277595838e-08
+Reached timestep 4644000000 with 114 bodies, 0 test particles. Total Energy: -3.3137308753370260569e-08
+Reached timestep 4650000000 with 114 bodies, 0 test particles. Total Energy: -3.3137308644336976755e-08
+Reached timestep 4656000000 with 114 bodies, 0 test particles. Total Energy: -3.313731207899904504e-08
+Body 1444 too close to central mass -> removed
+Reached timestep 4662000000 with 113 bodies, 0 test particles. Total Energy: -3.3137314000030964716e-08
+Reached timestep 4668000000 with 113 bodies, 0 test particles. Total Energy: -3.3137314705887256437e-08
+Reached timestep 4674000000 with 113 bodies, 0 test particles. Total Energy: -3.3137312175925852375e-08
+Reached timestep 4680000000 with 113 bodies, 0 test particles. Total Energy: -3.3137312849196217515e-08
+Reached timestep 4686000000 with 113 bodies, 0 test particles. Total Energy: -3.3137314446094343668e-08
+Reached timestep 4692000000 with 113 bodies, 0 test particles. Total Energy: -3.3137317029763109214e-08
+Reached timestep 4698000000 with 113 bodies, 0 test particles. Total Energy: -3.3137319781403623485e-08
+Reached timestep 4704000000 with 113 bodies, 0 test particles. Total Energy: -3.3137320386336786574e-08
+Reached timestep 4710000000 with 113 bodies, 0 test particles. Total Energy: -3.3137323694468126903e-08
+Reached timestep 4716000000 with 113 bodies, 0 test particles. Total Energy: -3.3137324680062919129e-08
+Reached timestep 4722000000 with 113 bodies, 0 test particles. Total Energy: -3.3137325939097489576e-08
+Reached timestep 4728000000 with 113 bodies, 0 test particles. Total Energy: -3.3137327725679320286e-08
+Reached timestep 4734000000 with 113 bodies, 0 test particles. Total Energy: -3.3137328229939679449e-08
+Reached timestep 4740000000 with 113 bodies, 0 test particles. Total Energy: -3.3137327682694284185e-08
+Reached timestep 4746000000 with 113 bodies, 0 test particles. Total Energy: -3.3137326573270818957e-08
+Reached timestep 4752000000 with 113 bodies, 0 test particles. Total Energy: -3.313732644251667223e-08
+Reached timestep 4758000000 with 113 bodies, 0 test particles. Total Energy: -3.3137326138059195991e-08
+Reached timestep 4764000000 with 113 bodies, 0 test particles. Total Energy: -3.3137326865678629481e-08
+Body 5047 too close to central mass -> removed
+Reached timestep 4770000000 with 112 bodies, 0 test particles. Total Energy: -3.3137327270775868745e-08
+Reached timestep 4776000000 with 112 bodies, 0 test particles. Total Energy: -3.313732802797170752e-08
+Body 5525 too close to central mass -> removed
+Reached timestep 4782000000 with 111 bodies, 0 test particles. Total Energy: -3.3137329100192956308e-08
+Reached timestep 4788000000 with 111 bodies, 0 test particles. Total Energy: -3.3137329009241986269e-08
+Reached timestep 4794000000 with 111 bodies, 0 test particles. Total Energy: -3.3137329895905289019e-08
+Reached timestep 4800000000 with 111 bodies, 0 test particles. Total Energy: -3.313733064063228665e-08
+Reached timestep 4806000000 with 111 bodies, 0 test particles. Total Energy: -3.3137330940302392228e-08
+Reached timestep 4812000000 with 111 bodies, 0 test particles. Total Energy: -3.3137330817052441253e-08
+Reached timestep 4818000000 with 111 bodies, 0 test particles. Total Energy: -3.3137330718220418592e-08
+Reached timestep 4824000000 with 111 bodies, 0 test particles. Total Energy: -3.3137331506784984368e-08
+Reached timestep 4830000000 with 111 bodies, 0 test particles. Total Energy: -3.3137331046469362871e-08
+Reached timestep 4836000000 with 111 bodies, 0 test particles. Total Energy: -3.3137330997900076776e-08
+Reached timestep 4842000000 with 111 bodies, 0 test particles. Total Energy: -3.3137331197560373615e-08
+Reached timestep 4848000000 with 111 bodies, 0 test particles. Total Energy: -3.3137331664352587698e-08
+Reached timestep 4854000000 with 111 bodies, 0 test particles. Total Energy: -3.3137331763776381987e-08
+Reached timestep 4860000000 with 111 bodies, 0 test particles. Total Energy: -3.3137332300133420177e-08
+Body 6290 too close to central mass -> removed
+Reached timestep 4866000000 with 110 bodies, 0 test particles. Total Energy: -3.3137333246740622565e-08
+Reached timestep 4872000000 with 110 bodies, 0 test particles. Total Energy: -3.3137334072260203508e-08
+Reached timestep 4878000000 with 110 bodies, 0 test particles. Total Energy: -3.3137334086043143478e-08
+Reached timestep 4884000000 with 110 bodies, 0 test particles. Total Energy: -3.3137334178609458288e-08
+Reached timestep 4890000000 with 110 bodies, 0 test particles. Total Energy: -3.3137334295800073048e-08
+Reached timestep 4896000000 with 110 bodies, 0 test particles. Total Energy: -3.3137335528608313073e-08
+Reached timestep 4902000000 with 110 bodies, 0 test particles. Total Energy: -3.3137336428339977624e-08
+Body 5196 ejected
+Reached timestep 4908000000 with 109 bodies, 0 test particles. Total Energy: -3.3137334533528313555e-08
+Reached timestep 4914000000 with 109 bodies, 0 test particles. Total Energy: -3.3137337156550249682e-08
+Reached timestep 4920000000 with 109 bodies, 0 test particles. Total Energy: -3.3137337287463837127e-08
+Reached timestep 4926000000 with 109 bodies, 0 test particles. Total Energy: -3.3137338588419947487e-08
+Reached timestep 4932000000 with 109 bodies, 0 test particles. Total Energy: -3.3137338967382428531e-08
+Reached timestep 4938000000 with 109 bodies, 0 test particles. Total Energy: -3.3137339028829308724e-08
+Reached timestep 4944000000 with 109 bodies, 0 test particles. Total Energy: -3.3137339640074521632e-08
+Reached timestep 4950000000 with 109 bodies, 0 test particles. Total Energy: -3.3137339955120889094e-08
+Reached timestep 4956000000 with 109 bodies, 0 test particles. Total Energy: -3.3137339939789936855e-08
+Reached timestep 4962000000 with 109 bodies, 0 test particles. Total Energy: -3.3137341284026175037e-08
+Reached timestep 4968000000 with 109 bodies, 0 test particles. Total Energy: -3.3137343105579342544e-08
+Reached timestep 4974000000 with 109 bodies, 0 test particles. Total Energy: -3.3137343083999894429e-08
+Reached timestep 4980000000 with 109 bodies, 0 test particles. Total Energy: -3.3137343671521322523e-08
+Reached timestep 4986000000 with 109 bodies, 0 test particles. Total Energy: -3.3137345019755218727e-08
+Body 5053 too close to central mass -> removed
+Reached timestep 4992000000 with 108 bodies, 0 test particles. Total Energy: -3.3137347888860151158e-08
+Reached timestep 4998000000 with 108 bodies, 0 test particles. Total Energy: -3.3137347386707408491e-08
+Reached timestep 5004000000 with 108 bodies, 0 test particles. Total Energy: -3.313734861982448467e-08
+Reached timestep 5010000000 with 108 bodies, 0 test particles. Total Energy: -3.3137349144405237029e-08
+Body 5626 too close to central mass -> removed
+Reached timestep 5016000000 with 107 bodies, 0 test particles. Total Energy: -3.3137349778195700901e-08
+Reached timestep 5022000000 with 107 bodies, 0 test particles. Total Energy: -3.3137350024471231764e-08
+Reached timestep 5028000000 with 107 bodies, 0 test particles. Total Energy: -3.3137350143345787728e-08
+Reached timestep 5034000000 with 107 bodies, 0 test particles. Total Energy: -3.313734993900969035e-08
+Reached timestep 5040000000 with 107 bodies, 0 test particles. Total Energy: -3.3137350446465434984e-08
+Reached timestep 5046000000 with 107 bodies, 0 test particles. Total Energy: -3.313735184156915817e-08
+Reached timestep 5052000000 with 107 bodies, 0 test particles. Total Energy: -3.3137354028288803915e-08
+Reached timestep 5058000000 with 107 bodies, 0 test particles. Total Energy: -3.3137354207893273004e-08
+Reached timestep 5064000000 with 107 bodies, 0 test particles. Total Energy: -3.313735371999133028e-08
+Reached timestep 5070000000 with 107 bodies, 0 test particles. Total Energy: -3.3137356810376340992e-08
+Reached timestep 5076000000 with 107 bodies, 0 test particles. Total Energy: -3.3137357982545227625e-08
+Reached timestep 5082000000 with 107 bodies, 0 test particles. Total Energy: -3.3137359030585902614e-08
+Reached timestep 5088000000 with 107 bodies, 0 test particles. Total Energy: -3.3137359674012061092e-08
+Reached timestep 5094000000 with 107 bodies, 0 test particles. Total Energy: -3.3137362664200624649e-08
+Reached timestep 5100000000 with 107 bodies, 0 test particles. Total Energy: -3.3137363831787817426e-08
+Reached timestep 5106000000 with 107 bodies, 0 test particles. Total Energy: -3.3137364369604650726e-08
+Reached timestep 5112000000 with 107 bodies, 0 test particles. Total Energy: -3.3137365234235733164e-08
+Reached timestep 5118000000 with 107 bodies, 0 test particles. Total Energy: -3.31373664266989932e-08
+Reached timestep 5124000000 with 107 bodies, 0 test particles. Total Energy: -3.3137367241360346296e-08
+Reached timestep 5130000000 with 107 bodies, 0 test particles. Total Energy: -3.313736969961521668e-08
+Reached timestep 5136000000 with 107 bodies, 0 test particles. Total Energy: -3.313737272238128281e-08
+Reached timestep 5142000000 with 107 bodies, 0 test particles. Total Energy: -3.3137373613813553108e-08
+Reached timestep 5148000000 with 107 bodies, 0 test particles. Total Energy: -3.3137375718231010922e-08
+Reached timestep 5154000000 with 107 bodies, 0 test particles. Total Energy: -3.3137376648915515914e-08
+Reached timestep 5160000000 with 107 bodies, 0 test particles. Total Energy: -3.3137378770804636305e-08
+Reached timestep 5166000000 with 107 bodies, 0 test particles. Total Energy: -3.3137378912848038153e-08
+Reached timestep 5172000000 with 107 bodies, 0 test particles. Total Energy: -3.3137378765295659748e-08
+Reached timestep 5178000000 with 107 bodies, 0 test particles. Total Energy: -3.3137379133417740341e-08
+Reached timestep 5184000000 with 107 bodies, 0 test particles. Total Energy: -3.3137381218095426193e-08
+Reached timestep 5190000000 with 107 bodies, 0 test particles. Total Energy: -3.313738236688998866e-08
+Reached timestep 5196000000 with 107 bodies, 0 test particles. Total Energy: -3.313738250383188312e-08
+Reached timestep 5202000000 with 107 bodies, 0 test particles. Total Energy: -3.3137382782696106657e-08
+Reached timestep 5208000000 with 107 bodies, 0 test particles. Total Energy: -3.3137381475326785598e-08
+Reached timestep 5214000000 with 107 bodies, 0 test particles. Total Energy: -3.3137385198773388331e-08
+Reached timestep 5220000000 with 107 bodies, 0 test particles. Total Energy: -3.3137386283399295666e-08
+Reached timestep 5226000000 with 107 bodies, 0 test particles. Total Energy: -3.3137387268690678043e-08
+Reached timestep 5232000000 with 107 bodies, 0 test particles. Total Energy: -3.3137387628523098645e-08
+Reached timestep 5238000000 with 107 bodies, 0 test particles. Total Energy: -3.3137388395272800703e-08
+Reached timestep 5244000000 with 107 bodies, 0 test particles. Total Energy: -3.3137387793767302019e-08
+Reached timestep 5250000000 with 107 bodies, 0 test particles. Total Energy: -3.3137388121587085143e-08
+Reached timestep 5256000000 with 107 bodies, 0 test particles. Total Energy: -3.3137391092141570567e-08
+Reached timestep 5262000000 with 107 bodies, 0 test particles. Total Energy: -3.3137393049842678112e-08
+Reached timestep 5268000000 with 107 bodies, 0 test particles. Total Energy: -3.3137396212798871089e-08
+Reached timestep 5274000000 with 107 bodies, 0 test particles. Total Energy: -3.3137397967282970598e-08
+Reached timestep 5280000000 with 107 bodies, 0 test particles. Total Energy: -3.3137401618728113368e-08
+Reached timestep 5286000000 with 107 bodies, 0 test particles. Total Energy: -3.3137404213752334953e-08
+Reached timestep 5292000000 with 107 bodies, 0 test particles. Total Energy: -3.3137403721261783142e-08
+Reached timestep 5298000000 with 107 bodies, 0 test particles. Total Energy: -3.3137404212549104799e-08
+Reached timestep 5304000000 with 107 bodies, 0 test particles. Total Energy: -3.313740530419530061e-08
+Reached timestep 5310000000 with 107 bodies, 0 test particles. Total Energy: -3.3137407344206907597e-08
+Body 6204 too close to central mass -> removed
+Reached timestep 5316000000 with 106 bodies, 0 test particles. Total Energy: -3.3137409975589230967e-08
+Reached timestep 5322000000 with 106 bodies, 0 test particles. Total Energy: -3.3137413128889281433e-08
+Reached timestep 5328000000 with 106 bodies, 0 test particles. Total Energy: -3.3137414647987034334e-08
+Reached timestep 5334000000 with 106 bodies, 0 test particles. Total Energy: -3.3137415653357345961e-08
+Reached timestep 5340000000 with 106 bodies, 0 test particles. Total Energy: -3.3137418090780347596e-08
+Reached timestep 5346000000 with 106 bodies, 0 test particles. Total Energy: -3.313741817959399543e-08
+Reached timestep 5352000000 with 106 bodies, 0 test particles. Total Energy: -3.3137420406893540458e-08
+Body 1284 too close to central mass -> removed
+Reached timestep 5358000000 with 105 bodies, 0 test particles. Total Energy: -3.3137422674390575862e-08
+Reached timestep 5364000000 with 105 bodies, 0 test particles. Total Energy: -3.3137422767588611814e-08
+Reached timestep 5370000000 with 105 bodies, 0 test particles. Total Energy: -3.3137424374916506109e-08
+Reached timestep 5376000000 with 105 bodies, 0 test particles. Total Energy: -3.3137428080772861653e-08
+Reached timestep 5382000000 with 105 bodies, 0 test particles. Total Energy: -3.3137427374677600761e-08
+Reached timestep 5388000000 with 105 bodies, 0 test particles. Total Energy: -3.3137430191686373959e-08
+Reached timestep 5394000000 with 105 bodies, 0 test particles. Total Energy: -3.3137432979512784246e-08
+Reached timestep 5400000000 with 105 bodies, 0 test particles. Total Energy: -3.313743667127370422e-08
+Reached timestep 5406000000 with 105 bodies, 0 test particles. Total Energy: -3.3137439438328577004e-08
+Reached timestep 5412000000 with 105 bodies, 0 test particles. Total Energy: -3.3137443307340253412e-08
+Reached timestep 5418000000 with 105 bodies, 0 test particles. Total Energy: -3.3137446129831136342e-08
+Reached timestep 5424000000 with 105 bodies, 0 test particles. Total Energy: -3.3137447928812861038e-08
+Reached timestep 5430000000 with 105 bodies, 0 test particles. Total Energy: -3.3137448799391848535e-08
+Reached timestep 5436000000 with 105 bodies, 0 test particles. Total Energy: -3.3137451664319935772e-08
+Reached timestep 5442000000 with 105 bodies, 0 test particles. Total Energy: -3.3137454078568949769e-08
+Reached timestep 5448000000 with 105 bodies, 0 test particles. Total Energy: -3.313745819176644735e-08
+Reached timestep 5454000000 with 105 bodies, 0 test particles. Total Energy: -3.3137458746305113928e-08
+Reached timestep 5460000000 with 105 bodies, 0 test particles. Total Energy: -3.3137460261812744151e-08
+Reached timestep 5466000000 with 105 bodies, 0 test particles. Total Energy: -3.3137464452550218527e-08
+Reached timestep 5472000000 with 105 bodies, 0 test particles. Total Energy: -3.31374641132293294e-08
+Reached timestep 5478000000 with 105 bodies, 0 test particles. Total Energy: -3.3137465407506618059e-08
+Body 6935 ejected
+Reached timestep 5484000000 with 104 bodies, 0 test particles. Total Energy: -3.3137468770395561316e-08
+Reached timestep 5490000000 with 104 bodies, 0 test particles. Total Energy: -3.3137476853398889936e-08
+Reached timestep 5496000000 with 104 bodies, 0 test particles. Total Energy: -3.3137477811741396319e-08
+Reached timestep 5502000000 with 104 bodies, 0 test particles. Total Energy: -3.3137480574991013293e-08
+Reached timestep 5508000000 with 104 bodies, 0 test particles. Total Energy: -3.3137484157056256452e-08
+Body 2992 too close to central mass -> removed
+Reached timestep 5514000000 with 103 bodies, 0 test particles. Total Energy: -3.3137486803417120033e-08
+Reached timestep 5520000000 with 103 bodies, 0 test particles. Total Energy: -3.3137487873925668202e-08
+Reached timestep 5526000000 with 103 bodies, 0 test particles. Total Energy: -3.3137490276442799423e-08
+Reached timestep 5532000000 with 103 bodies, 0 test particles. Total Energy: -3.3137491583231406605e-08
+Reached timestep 5538000000 with 103 bodies, 0 test particles. Total Energy: -3.3137492395872844202e-08
+Reached timestep 5544000000 with 103 bodies, 0 test particles. Total Energy: -3.3137492318879785993e-08
+Reached timestep 5550000000 with 103 bodies, 0 test particles. Total Energy: -3.3137492317184429697e-08
+Reached timestep 5556000000 with 103 bodies, 0 test particles. Total Energy: -3.3137492059442044726e-08
+Reached timestep 5562000000 with 103 bodies, 0 test particles. Total Energy: -3.3137491917597133138e-08
+Reached timestep 5568000000 with 103 bodies, 0 test particles. Total Energy: -3.3137490541297157569e-08
+Reached timestep 5574000000 with 103 bodies, 0 test particles. Total Energy: -3.3137489498774849292e-08
+Reached timestep 5580000000 with 103 bodies, 0 test particles. Total Energy: -3.3137489092535154489e-08
+Body 5650 too close to central mass -> removed
+Reached timestep 5586000000 with 102 bodies, 0 test particles. Total Energy: -3.3137489915447793014e-08
+Reached timestep 5592000000 with 102 bodies, 0 test particles. Total Energy: -3.3137489695550476167e-08
+Reached timestep 5598000000 with 102 bodies, 0 test particles. Total Energy: -3.3137492150228108039e-08
+Reached timestep 5604000000 with 102 bodies, 0 test particles. Total Energy: -3.3137491383032429899e-08
+Reached timestep 5610000000 with 102 bodies, 0 test particles. Total Energy: -3.3137491938498531379e-08
+Reached timestep 5616000000 with 102 bodies, 0 test particles. Total Energy: -3.313749324399371925e-08
+Reached timestep 5622000000 with 102 bodies, 0 test particles. Total Energy: -3.3137492998075616438e-08
+Reached timestep 5628000000 with 102 bodies, 0 test particles. Total Energy: -3.3137497440852211045e-08
+Reached timestep 5634000000 with 102 bodies, 0 test particles. Total Energy: -3.3137499893784538147e-08
+Reached timestep 5640000000 with 102 bodies, 0 test particles. Total Energy: -3.3137505380477558e-08
+Reached timestep 5646000000 with 102 bodies, 0 test particles. Total Energy: -3.3137506810620618846e-08
+Reached timestep 5652000000 with 102 bodies, 0 test particles. Total Energy: -3.3137507154160830546e-08
+Reached timestep 5658000000 with 102 bodies, 0 test particles. Total Energy: -3.3137506994994095187e-08
+Reached timestep 5664000000 with 102 bodies, 0 test particles. Total Energy: -3.3137506936343436189e-08
+Reached timestep 5670000000 with 102 bodies, 0 test particles. Total Energy: -3.3137506717989069265e-08
+Reached timestep 5676000000 with 102 bodies, 0 test particles. Total Energy: -3.313750797807374219e-08
+Reached timestep 5682000000 with 102 bodies, 0 test particles. Total Energy: -3.3137506972039409672e-08
+Reached timestep 5688000000 with 102 bodies, 0 test particles. Total Energy: -3.3137507744923251542e-08
+Reached timestep 5694000000 with 102 bodies, 0 test particles. Total Energy: -3.3137510435646069454e-08
+Reached timestep 5700000000 with 102 bodies, 0 test particles. Total Energy: -3.313751720929195834e-08
+Reached timestep 5706000000 with 102 bodies, 0 test particles. Total Energy: -3.3137517145437155384e-08
+Body 5194 too close to central mass -> removed
+Reached timestep 5712000000 with 101 bodies, 0 test particles. Total Energy: -3.313751925826739737e-08
+Reached timestep 5718000000 with 101 bodies, 0 test particles. Total Energy: -3.3137522872877340429e-08
+Reached timestep 5724000000 with 101 bodies, 0 test particles. Total Energy: -3.3137523810869953046e-08
+Reached timestep 5730000000 with 101 bodies, 0 test particles. Total Energy: -3.3137524599190123347e-08
+Reached timestep 5736000000 with 101 bodies, 0 test particles. Total Energy: -3.3137524761870523425e-08
+Reached timestep 5742000000 with 101 bodies, 0 test particles. Total Energy: -3.3137526104095091445e-08
+Reached timestep 5748000000 with 101 bodies, 0 test particles. Total Energy: -3.3137527129148463533e-08
+Reached timestep 5754000000 with 101 bodies, 0 test particles. Total Energy: -3.3137528209527698395e-08
+Reached timestep 5760000000 with 101 bodies, 0 test particles. Total Energy: -3.3137530951093741757e-08
+Reached timestep 5766000000 with 101 bodies, 0 test particles. Total Energy: -3.3137530821891035135e-08
+Reached timestep 5772000000 with 101 bodies, 0 test particles. Total Energy: -3.3137531233000540728e-08
+Reached timestep 5778000000 with 101 bodies, 0 test particles. Total Energy: -3.3137532173582447037e-08
+Reached timestep 5784000000 with 101 bodies, 0 test particles. Total Energy: -3.3137532259993591795e-08
+Body 6920 too close to central mass -> removed
+Reached timestep 5790000000 with 100 bodies, 0 test particles. Total Energy: -3.3137531926639176279e-08
+Body 3800 too close to central mass -> removed
+Reached timestep 5796000000 with 99 bodies, 0 test particles. Total Energy: -3.3137535869693092953e-08
+Reached timestep 5802000000 with 99 bodies, 0 test particles. Total Energy: -3.3137536982534150834e-08
+Reached timestep 5808000000 with 99 bodies, 0 test particles. Total Energy: -3.3137539956659250707e-08
+Reached timestep 5814000000 with 99 bodies, 0 test particles. Total Energy: -3.3137539108598217213e-08
+Reached timestep 5820000000 with 99 bodies, 0 test particles. Total Energy: -3.3137538078244198968e-08
+Reached timestep 5826000000 with 99 bodies, 0 test particles. Total Energy: -3.3137537734599491195e-08
+Reached timestep 5832000000 with 99 bodies, 0 test particles. Total Energy: -3.313753813900353987e-08
+Collision between body 6863 and 5323 at time step 5834449016
+Reached timestep 5838000000 with 98 bodies, 0 test particles. Total Energy: -3.3137538462908502149e-08
+Reached timestep 5844000000 with 98 bodies, 0 test particles. Total Energy: -3.3137538916048795054e-08
+Reached timestep 5850000000 with 98 bodies, 0 test particles. Total Energy: -3.3137538918765408387e-08
+Body 1410 too close to central mass -> removed
+Reached timestep 5856000000 with 97 bodies, 0 test particles. Total Energy: -3.3137539451944564247e-08
+Reached timestep 5862000000 with 97 bodies, 0 test particles. Total Energy: -3.313754017374692618e-08
+Reached timestep 5868000000 with 97 bodies, 0 test particles. Total Energy: -3.3137540043813011749e-08
+Reached timestep 5874000000 with 97 bodies, 0 test particles. Total Energy: -3.3137540190081274971e-08
+Collision between body 4189 and 5950 at time step 5876393825
+Reached timestep 5880000000 with 96 bodies, 0 test particles. Total Energy: -3.3137540410947716624e-08
+Reached timestep 5886000000 with 96 bodies, 0 test particles. Total Energy: -3.3137539900180642266e-08
+Reached timestep 5892000000 with 96 bodies, 0 test particles. Total Energy: -3.3137540084732571243e-08
+Reached timestep 5898000000 with 96 bodies, 0 test particles. Total Energy: -3.3137539797500582013e-08
+Reached timestep 5904000000 with 96 bodies, 0 test particles. Total Energy: -3.313754016453771928e-08
+Reached timestep 5910000000 with 96 bodies, 0 test particles. Total Energy: -3.3137540008269696102e-08
+Reached timestep 5916000000 with 96 bodies, 0 test particles. Total Energy: -3.3137540293989030072e-08
+Reached timestep 5922000000 with 96 bodies, 0 test particles. Total Energy: -3.3137540275633091569e-08
+Reached timestep 5928000000 with 96 bodies, 0 test particles. Total Energy: -3.3137540021183692765e-08
+Reached timestep 5934000000 with 96 bodies, 0 test particles. Total Energy: -3.313754034160470927e-08
+Reached timestep 5940000000 with 96 bodies, 0 test particles. Total Energy: -3.3137540940733784229e-08
+Reached timestep 5946000000 with 96 bodies, 0 test particles. Total Energy: -3.3137540905194266996e-08
+Reached timestep 5952000000 with 96 bodies, 0 test particles. Total Energy: -3.3137541804833552015e-08
+Reached timestep 5958000000 with 96 bodies, 0 test particles. Total Energy: -3.3137541301421734577e-08
+Reached timestep 5964000000 with 96 bodies, 0 test particles. Total Energy: -3.3137540372166458717e-08
+Reached timestep 5970000000 with 96 bodies, 0 test particles. Total Energy: -3.3137540844368692087e-08
+Reached timestep 5976000000 with 96 bodies, 0 test particles. Total Energy: -3.3137541306328298656e-08
+Reached timestep 5982000000 with 96 bodies, 0 test particles. Total Energy: -3.3137540880872794559e-08
+Reached timestep 5988000000 with 96 bodies, 0 test particles. Total Energy: -3.3137540577743128491e-08
+Reached timestep 5994000000 with 96 bodies, 0 test particles. Total Energy: -3.3137540386518492331e-08
+Reached timestep 6000000000 with 96 bodies, 0 test particles. Total Energy: -3.3137540565170830213e-08
+Execution time: 
+
+345485
+Integration finished with 96 bodies, 0 test particles. Total Energy: -3.3137540565170830213e-08
+GENGA terminated successfully
