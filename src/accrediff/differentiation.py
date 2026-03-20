@@ -5,7 +5,7 @@ from dataclasses import dataclass, replace
 from typing import Literal, Optional, Tuple, Dict, Callable
 import math
 from .utils import power_law
-from scipy.optimize import minimize_scalar 
+from scipy.optimize import minimize_scalar  # type: ignore
 
 # =========================
 # 数据结构
