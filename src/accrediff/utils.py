@@ -74,3 +74,16 @@ class WeightedECDF:
         res = self.a_sorted[idx]
         return res if np.ndim(q) else float(res[0])
 #**************************************************************************************************************************************
+
+def compute_error_metrics(ref, calc, eps=1e-12):
+    ref = np.asarray(ref, dtype=float)
+    calc = np.asarray(calc, dtype=float)
+
+    residual = calc - ref
+    mae = np.mean(np.abs(residual))
+    rmse = np.sqrt(np.mean(residual**2))
+    mape = np.mean(np.abs(residual) / np.where(np.abs(ref) > eps, np.abs(ref), np.nan)) * 100.0
+
+    return residual, mae, rmse, mape
+
+#**************************************************************************************************************************************

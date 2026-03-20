@@ -44,7 +44,13 @@ from .differentiation import (
 from .melt_model import MeltScalingModel
 
 # --- Utilities / plotting ---
-from .utils import normalize_max, power_law, error_rate, WeightedECDF
+from .utils import (
+    normalize_max, 
+    power_law, 
+    error_rate,
+    compute_error_metrics, 
+    WeightedECDF)
+                    
 #from .plotting import images_to_video
 # --- Gas disk migration (Cresswell & Nelson 2008) ---
 from .gas_migration import (
@@ -91,5 +97,6 @@ __all__ = [
     "power_law",
     "error_rate",
     "WeightedECDF",
+    "compute_error_metrics",
     # "images_to_video",
 ]
