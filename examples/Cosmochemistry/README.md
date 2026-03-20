@@ -27,43 +27,23 @@ Bulk Earth Reference enriched in refractory elements (Rubie et al., 2011).
 
 ---
 
-### 2. `A_Meteorites.ipynb` — Chondrite Endmember Compositions
+### 2. `B_Meteorite.ipynb` — Chondrite Endmember Compositions
 
 Establishes bulk compositions for four chondrite groups (**EH/EF, EL/EC, OC, CI**)
-and compares them with Earth and Mars bulk compositions.
+and compares them with **Earth** and **Mars** bulk compositions.
 
 **Key steps:**
 - Load meteorite and planetary mantle/core compositions from `ad.constants`
-- Compute compound molar masses using `MolarMassCalculator`
-- Convert weight percent to molar amounts and normalize to MgO
-- Apply refractory element enrichment and volatile element depletion corrections
-  for the EF endmember
-- Plot CI-chondrite-normalized element abundance diagrams (mantle vs. core)
-- Export normalized compositions to CSV
+- Compute compound molar masses for oxides & metals using `MolarMassCalculator`
+- Convert weight percent (wt%) to molar amounts via a reusable `wt_to_molar()` helper
+- Normalize all molar amounts to MgO using `normalize_to_mgo()`
+- Apply refractory element enrichment (Al₂O₃, CaO ×1.5) and volatile element
+  depletion (SiO₂, Si ×0.6) corrections for the EF endmember
+- Double-normalize to Mg and CI chondrites for cross-system comparison
+  (mantle oxides and core metals mapped via `core_oxide_map`)
+- Plot CI-chondrite-normalized spider diagram (mantle ■ vs. core ●)
+- Export MgO-normalized molar compositions to CSV
 
 **Output:**
 - `Tables/A2_Meteorites_composition.csv`
 
----
-
-## Dependencies
-
-- Python ≥ 3.9
-- `accrediff` (located in `src/` of this project)
-- `numpy`, `pandas`, `matplotlib`
-
-## Usage
-
-Open the notebooks directly in Jupyter or VS Code:
-
-```bash
-cd examples/Cosmochemistry
-jupyter notebook A_IW15IW35.ipynb
-jupyter notebook A_Meteorites.ipynb
-```
-
-## Related Notebooks
-
-For earlier exploratory versions with additional visualizations, see:
-- [`notebooks/A1_IW35IW15.ipynb`](../../notebooks/A1_IW35IW15.ipynb)
-- [`notebooks/A2_Meteorites.ipynb`](../../notebooks/A2_Meteorites.ipynb)
