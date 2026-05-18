@@ -259,7 +259,7 @@ class ImpactEventProcessor:
         for i in Global_index:
             Mass, Impact_ratio = self.df_CE.loc[i, ['Mass', 'Impact ratio']].values
             impact = MeltScalingModel(
-                Mtotal=10 * Mass,
+                Mtotal=9.31 * Mass, # M_Earth = 9.31 M_Mars
                 gamma=Impact_ratio,
                 vel=1.0,
                 entropy0=1100,
@@ -295,7 +295,7 @@ class ImpactEventProcessor:
 # df_CE = processor.df_CE
 # df_CE = processor.update_global_melting_process()
 #**************************************************************************************************************************************
-def update_partial_melting_process(df_CE, Mtotal=0.1, ratio=[0.1, 0.5], events='partial'):
+def update_partial_melting_process(df_CE, Mtotal=0.1, ratio=[0.1, 0.5], events='partial' ,P_ratio=0.6):
     """
     标记满足条件的事件为'partial'，并计算其P_equil和T_equil
     """
@@ -305,7 +305,7 @@ def update_partial_melting_process(df_CE, Mtotal=0.1, ratio=[0.1, 0.5], events='
     for i in Partial_index:
         Mass, Impact_ratio = df_CE.loc[i, ['Mass', 'Impact ratio']].values
         impact = MeltScalingModel(
-            Mtotal=10 * Mass,
+            Mtotal=9.31 * Mass, # M_Earth = 9.31 M_Mars
             gamma=Impact_ratio,
             vel=1.0,
             entropy0=1100,
@@ -314,7 +314,7 @@ def update_partial_melting_process(df_CE, Mtotal=0.1, ratio=[0.1, 0.5], events='
         # 屏蔽 impact.run_model() 的输出
         with contextlib.redirect_stdout(io.StringIO()):
             impact_res = impact.run_model()
-        P_Partial = impact_res['max pressure (melt pool model)'][0]
+        P_Partial = impact_res['max pressure (melt pool model)'][0] * P_ratio
         df_CE.loc[i, ['P_equil', 'T_equil']] = [P_Partial, P_to_T(P_Partial)]
     return df_CE
 # 用法示例：
