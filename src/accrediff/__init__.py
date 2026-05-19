@@ -58,8 +58,10 @@ from .gas_migration import (
     Gas_UnitSystem,
     Gas_DiskModel,
     Gas_TorqueModel,
+    #Gas_TorqueModel_V2,
     Gas_MigrationIntegrator,
     Gas_build_model,
+    #Gas_build_model_v2,
 )
 __all__ = [
     "__version__",
@@ -90,6 +92,15 @@ __all__ = [
     "EarlyComUpdater",
     "ForwardKDOSolver",
     "OLSolver",
+    # gas migration
+    "Gas_ModelConfig",
+    "Gas_UnitSystem",
+    "Gas_DiskModel",
+    "Gas_TorqueModel",
+    #"Gas_TorqueModel_V2",
+    "Gas_MigrationIntegrator",
+    "Gas_build_model",
+    #"Gas_build_model_v2",
     # melt scaling
     "MeltScalingModel",
     # utils / plotting
@@ -98,5 +109,7 @@ __all__ = [
     "error_rate",
     "WeightedECDF",
     "compute_error_metrics",
+    #"generate_migration_map_v2",
+    #"plot_migration_map_v2",
     # "images_to_video",
 ]

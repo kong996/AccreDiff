@@ -43,7 +43,7 @@ class Gas_ModelConfig:
     AU_in_cm: float = 1.495978707e13
     Msun_in_g: float = 1.98847e33
     Sigma0_cgs: float = 1600.0  # g/cm^2
-    Sigma0_code = Sigma0_cgs * AU_in_cm**2 / Msun_in_g
+    Sigma0_code = 0.0 # 将在 __post_init__ 中计算
 
     # ---- gas disk decay ----
     tau_decay_myr: float = 2.0
@@ -53,6 +53,14 @@ class Gas_ModelConfig:
     n_steps: int = 20000
     a_min_stop: float = 0.05
     a_max_stop: float = 10.0
+    # ---- viscosity / thermal diffusion ----
+    alpha_visc: float = 1.0e-3
+    prandtl: float = 1.0
+    use_saturation: bool = True
+    def __post_init__(self):
+        """在实例创建后自动计算派生参数"""
+        # 根据输入的 Sigma0_cgs 计算代码单位
+        self.Sigma0_code = self.Sigma0_cgs * self.AU_in_cm**2 / self.Msun_in_g
 
 
 # =========================================================
@@ -125,11 +133,24 @@ class Gas_DiskModel:
             * np.exp(-(self.cfg.a_alpha1 * np.log(r) + self.cfg.a_alpha2) * np.log(r))
             * np.exp(-t_code / self.tau_decay_code)
         )
+    def sigma_cgs(self, r, t_code):
+        """表面密度（物理单位：g/cm^2）"""
+        sigma_code = self.sigma(r, t_code)
+        return sigma_code * self.cfg.Msun_in_g / self.cfg.AU_in_cm**2
 
     def omega(self, r):
         r = np.asarray(r)
         return np.sqrt(self.cfg.G * self.cfg.Mstar / r ** 3)
+    
+    def viscosity(self, r):
+        r = np.asarray(r)
+        h = self.aspect_ratio(r)
+        omega = self.omega(r)
+        return self.cfg.alpha_visc * h**2 * r**2 * omega
 
+
+    def thermal_diffusivity(self, r):
+        return self.viscosity(r) / self.cfg.prandtl
 
 # =========================================================
 # 4. TorqueModel
@@ -163,27 +184,77 @@ class Gas_TorqueModel:
         q = self.disk.temp_slope_q(r)
         return (-2.5 - 1.7 * q + 0.1 * p) / self.cfg.gamma_eff * self.gamma0(r, t_code)
 
-    def gamma_c_baro(self, r, t_code):
+    def horseshoe_width(self, r):
+        h = self.disk.aspect_ratio(r)
+        return 1.1 / self.cfg.gamma_eff**0.25 * np.sqrt(self.qplanet / h)
+
+    def saturation_p(self, r, diffusivity):
+        r = np.asarray(r)
+        xs = self.horseshoe_width(r)
+        omega = self.disk.omega(r)
+        diffusivity = np.asarray(diffusivity)
+        diffusivity = np.maximum(diffusivity, 1e-30)
+        return (2.0 / 3.0) * np.sqrt(
+            r**2 * omega * xs**3 / (2.0 * np.pi * diffusivity)
+        )
+
+    def saturation_factor(self, p):
+        return 1.0 / (1.0 + (p / 1.3)**2)
+    def saturation_factors(self, r):
+        nu = self.disk.viscosity(r)
+        chi = self.disk.thermal_diffusivity(r)
+        p_nu = self.saturation_p(r, nu)
+        p_chi = self.saturation_p(r, chi)
+        f_nu = self.saturation_factor(p_nu)
+        f_chi = self.saturation_factor(p_chi)
+        return f_nu, f_chi, p_nu, p_chi
+    
+    def gamma_hs_baro_unsat(self, r, t_code):
         p = self.disk.sigma_slope_p(r)
         return 1.1 * (1.5 - p) / self.cfg.gamma_eff * self.gamma0(r, t_code)
 
-    def gamma_c_ent(self, r, t_code):
+    def gamma_hs_ent_unsat(self, r, t_code):
         xi = self.disk.entropy_slope_xi(r)
-        return 7.9 * xi / self.cfg.gamma_eff ** 2 * self.gamma0(r, t_code)
+        return 7.9 * xi / self.cfg.gamma_eff**2 * self.gamma0(r, t_code)
 
+    def gamma_c_baro(self, r, t_code):
+        gamma_unsat = self.gamma_hs_baro_unsat(r, t_code)
+        if not self.cfg.use_saturation:
+            return gamma_unsat
+        f_nu, f_chi, p_nu, p_chi = self.saturation_factors(r)
+        return f_nu * gamma_unsat
+
+    def gamma_c_ent(self, r, t_code):
+        gamma_unsat = self.gamma_hs_ent_unsat(r, t_code)
+        if not self.cfg.use_saturation:
+            return gamma_unsat
+        f_nu, f_chi, p_nu, p_chi = self.saturation_factors(r)
+        return f_nu * f_chi * gamma_unsat
+    
     def gamma_tot(self, r, t_code):
         return self.gamma_l(r, t_code) + self.gamma_c_baro(r, t_code) + self.gamma_c_ent(r, t_code)
 
     def profile(self, r_array, t_code=0.0):
         r_array = np.asarray(r_array)
+
+        f_nu, f_chi, p_nu, p_chi = self.saturation_factors(r_array)
+
         return {
             "r":            r_array,
+            "p":            self.disk.sigma_slope_p(r_array),
+            "q":            self.disk.temp_slope_q(r_array),
+            "xi":           self.disk.entropy_slope_xi(r_array),
+            "h":            self.disk.aspect_ratio(r_array),
+            "gamma0":       self.gamma0(r_array, t_code),
             "gamma_l":      self.gamma_l(r_array, t_code),
             "gamma_c_baro": self.gamma_c_baro(r_array, t_code),
             "gamma_c_ent":  self.gamma_c_ent(r_array, t_code),
             "gamma_tot":    self.gamma_tot(r_array, t_code),
+            "f_nu":         f_nu,
+            "f_chi":        f_chi,
+            "p_nu":         p_nu,
+            "p_chi":        p_chi,
         }
-
 
 # =========================================================
 # 5. MigrationIntegrator — Cresswell & Nelson (2008)
