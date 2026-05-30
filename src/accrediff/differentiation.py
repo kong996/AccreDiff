@@ -2,9 +2,10 @@
 import pandas as pd # type: ignore
 import numpy as np # type: ignore
 from dataclasses import dataclass, replace
-from typing import Literal, Optional, Tuple, Dict, Callable
+from typing import Literal, Optional, Tuple, Dict, Callable, Any
 import math
-from .utils import power_law
+import copy
+#from .utils import power_law
 from scipy.optimize import minimize_scalar  # type: ignore
 
 # =========================
@@ -46,6 +47,9 @@ def Early_pressure(mass, a=112.06, b=0.37):
     P_emb = a*mass + b 
     return P_emb
 #**************************************************************************************************************************************
+def power_law(x, a, b):
+    """Power law function."""
+    return a * (x ** b)
 def CMB_pressure(mass, a=136.50, b=0.91):
         """
         Calculate the pressure at the CMB for a given mass.
@@ -82,12 +86,15 @@ class EarlyComUpdater:
     用于批量更新early_com DataFrame中各粒子的化学参数。
     依赖自定义库 wisdom (import wisdom as wd)。
     """
-    def __init__(self, df, dict_com, keys_list, accrediff, m_ratio=True):
+    def __init__(self, df, dict_com, keys_list, accrediff, m_ratio=True, 
+                 KD_oxygen: Literal["Rubie", "Fischer"] = "Rubie"  # 修改：加 Literal 类型注解
+                 ):
         self.df = df
         self.dict_com  = dict_com
         self.keys_list = keys_list
         self.accrediff = accrediff
         self.m_ratio = m_ratio
+        self.KD_oxygen = KD_oxygen
         # 自动获取所有成分类型（如['IW15','IW35']），无需硬编码
         #self.com_types = [k for k in dict_IW.keys() if isinstance(dict_IW[k], dict) and k in df.columns]
         self.com_types = list(dict_com.keys())
@@ -146,6 +153,7 @@ class EarlyComUpdater:
             nonneg='clip',
             enforce_z_box=True,
             enforce_d_nonneg=True,
+            KD_oxygen=self.KD_oxygen,
         )
         res = solver.solve_x_for_KD_O(KD_O, tol=1e-12, max_iter=300, grid_N=400)
         res_dict = vars(res)
@@ -207,13 +215,15 @@ class ForwardKDOSolver:
         *,
         nonneg: Literal["clip", "softplus", "none"] = "clip",
         enforce_z_box: bool = False,
-        enforce_d_nonneg: bool = False
+        enforce_d_nonneg: bool = False,
+        KD_oxygen: Literal["Rubie", "Fischer"] = "Rubie"
 
     ) -> None:
         self.p = params
         self.nonneg: Literal["clip", "softplus", "none"] = nonneg
         self.enforce_z_box = enforce_z_box
         self.enforce_d_nonneg = enforce_d_nonneg
+        self.KD_oxygen = KD_oxygen
 
     # ======================== 公共接口 ========================
 
@@ -292,8 +302,13 @@ class ForwardKDOSolver:
         denom = sol["x_"] + sol["y_"] + sol["z_"] + p.u + p.m + p.n
         X_Sil_FeO = self._safe_div(sol["x_"], denom)
 
-        # Margules 非理想修正: FeO 的活度系数修正
-        X_MW_FeO = 1.148 * X_Sil_FeO + 1.319 * (X_Sil_FeO ** 2)
+        # Rubie et al. 2011: FeO 的活度系数修正
+        if self.KD_oxygen == "Rubie":
+            X_MW_FeO = 1.148 * X_Sil_FeO + 1.319 * (X_Sil_FeO ** 2)
+        elif self.KD_oxygen == "Fischer":
+            X_MW_FeO = X_Sil_FeO  # 先用理想近似 (Fischer et al. 2017 中 KD_O 定义即为理想近似)，后续可替换为非理想修正
+        else:
+            raise ValueError(f"Unsupported KD_oxygen model: {self.KD_oxygen}")
 
         # 金属相总摩尔数 = Fe + Ni + Si + O
         metal_sum = sol["a_"] + sol["b_"] + sol["c_"] + sol["d_"]
@@ -548,71 +563,196 @@ class ForwardKDOSolver:
         """氧守恒: d_ (金属中 O) = O_total - x_ - y_ - 2·z_"""
         return self._total_O() - x_ - y_ - 2.0 * z_
 #**************************************************************************************************************************************    
-class OLSolver:
-    """
-    O_L 反向求解器：寻找使 IW 与目标值一致的最佳 O_L。
-    使用 ForwardKDOSolver 作为内核。
-    """
 
+class OLSolver:
+    """改进版本：精度参数简化 + 结果缓存 + 递归修复"""
+    
     def __init__(
         self,
         base_params: KD_Params,
         KD_O_target: float,
         IW_target: float,
         solver_factory: Callable[[KD_Params], ForwardKDOSolver],
-        nonneg: Literal["clip", "softplus", "none"] = "clip",
-        enforce_z_box: bool = False,
-        enforce_d_nonneg: bool = False,
+        precision: Literal["fast", "normal", "high"] = "normal",
+        outer_tol: Optional[float] = None,
+        max_outer_iter: int = 300,
     ):
+        """
+        Parameters
+        ----------
+        precision : str
+            精度预设级别: "fast", "normal", "high"
+        outer_tol : float, optional
+            覆盖 precision 预设的外层精度
+        """
         self.base_params = base_params
         self.KD_O_target = KD_O_target
         self.IW_target = IW_target
         self.solver_factory = solver_factory
-        self.nonneg = nonneg
-        self.enforce_z_box = enforce_z_box
-        self.enforce_d_nonneg = enforce_d_nonneg
-
-    def _compute_IW(self, sol: Dict[str, float]) -> float:
-        """
-        根据正向求解得到的元素分布，计算 IW = 2 * log10(X_FeO / X_Fe)
-        """
-        sil_sum = sol["x_"] + sol["y_"] + sol["z_"] + self.base_params.u + self.base_params.m + self.base_params.n
-        metal_sum = sol["a_"] + sol["b_"] + sol["c_"] + sol["d_"]
-
-        eps = 1e-12  # 避免 log(0)
-        X_FeO = max(sol["x_"] / sil_sum, eps) if sil_sum > 0 else eps
-        X_Fe = max(sol["a_"] / metal_sum, eps) if metal_sum > 0 else eps
-
-        return 2.0 * math.log10(X_FeO / X_Fe)
+        self.max_outer_iter = max_outer_iter
+        
+        # ── 精度预设 ──
+        precision_presets = {
+            "fast": {
+                "inner_tol": 1e-6,
+                "inner_max_iter": 100,
+                "inner_grid_N": 50,
+                "outer_tol": 1e-4,
+            },
+            "normal": {
+                "inner_tol": 1e-10,
+                "inner_max_iter": 200,
+                "inner_grid_N": 200,
+                "outer_tol": 1e-6,
+            },
+            "high": {
+                "inner_tol": 1e-14,
+                "inner_max_iter": 500,
+                "inner_grid_N": 400,
+                "outer_tol": 1e-8,
+            },
+        }
+        
+        preset = precision_presets[precision]
+        self.inner_tol = preset["inner_tol"]
+        self.inner_max_iter = preset["inner_max_iter"]
+        self.inner_grid_N = preset["inner_grid_N"]
+        self.outer_tol = outer_tol if outer_tol is not None else preset["outer_tol"]
+        
+        # ── 结果缓存 ──
+        self._cached_result: Optional[Tuple[Dict, float]] = None
+        self._best_residual: float = float('inf')  # ← 追踪最小残差
 
     def _residual(self, O_L_guess: float) -> float:
         """
-        计算当前猜测的 O_L 对应的 IW 残差
+        计算残差，并缓存最优解。
+        
+        ⚠️ 不再在此调用自身！避免无限递归。
         """
         try:
-            new_params = replace(self.base_params, O_L=O_L_guess)
+            # ── 创建新参数（使用 dataclass replace 或深拷贝）
+            # 假设 KD_Params 是 dataclass
+            from copy import deepcopy
+            new_params = deepcopy(self.base_params)
+            new_params.O_L = O_L_guess
+            
+            # ── 内层求解
             solver = self.solver_factory(new_params)
-            kd_result = solver.solve_x_for_KD_O(self.KD_O_target)
-            IW_model = self._compute_IW(kd_result.__dict__)
-            return abs(IW_model - self.IW_target)
-        except Exception:
-            return 1e6  # 若计算失败，返回大残差
+            kd_result = solver.solve_x_for_KD_O(
+                self.KD_O_target,
+                tol=self.inner_tol,
+                max_iter=self.inner_max_iter,
+                grid_N=self.inner_grid_N,
+            )
+            res_dict = vars(kd_result) if hasattr(kd_result, '__dict__') else kd_result
+            
+            # ── 确保 res_dict 是字典类型
+            if not isinstance(res_dict, dict):
+                # 如果 KD_Result 有转换方法，使用它
+                res_dict = vars(res_dict)
+            # ── 计算 IW
+            IW_model = self._compute_IW(res_dict)
+            residual = abs(IW_model - self.IW_target)
+            
+            # ── 无条件缓存所有计算结果（不做递归比较！）
+            if residual < self._best_residual:
+                self._best_residual = residual
+                self._cached_result = (res_dict, IW_model)
+            
+            return residual
+            
+        except RecursionError as e:
+            print(f"  ERROR: RecursionError at O_L={O_L_guess}: {e}")
+            return 1e6
+        except Exception as e:
+            print(f"  Warning: residual computation failed at O_L={O_L_guess}: {type(e).__name__}")
+            return 1e6
 
-    def solve(
-        self,
-        O_bounds: Tuple[float, float] = (-10.0, 10.0),
-        tol: float = 1e-6,
-        max_iter: int = 200
-    ) -> Tuple[float, float]:
+    def _compute_IW(self, res_dict: Dict[str, float]) -> float:
         """
-        使用 scalar 最优化方法搜索最佳 O_L 值
-        返回：(最优 O_L, IW 残差)
+        计算 IW 指标（FeO-Fe 缓冲）。
+        
+        IW = 2 * log10(X_FeO_sil / X_Fe_met)
+        """
+        p = self.base_params
+        x_ = res_dict.get('x_', 0.0)
+        y_ = res_dict.get('y_', 0.0)
+        z_ = res_dict.get('z_', 0.0)
+        a_ = res_dict.get('a_', 0.0)
+        b_ = res_dict.get('b_', 0.0)
+        c_ = res_dict.get('c_', 0.0)
+        d_ = res_dict.get('d_', 0.0)
+        
+        # 硅酸盐相和金属相总量
+        sil_sum = x_ + y_ + p.u + p.m + p.n + z_
+        metal_sum = a_ + b_ + c_ + d_
+        
+        if sil_sum <= 1e-15 or metal_sum <= 1e-15:
+            return 1e10
+        
+        X_FeO_sil = x_ / sil_sum
+        X_Fe_met = a_ / metal_sum
+        
+        if X_FeO_sil <= 1e-15 or X_Fe_met <= 1e-15:
+            return 1e10
+        
+        import math
+        try:
+            IW = 2.0 * math.log10(X_FeO_sil / X_Fe_met)
+            return IW
+        except (ValueError, ZeroDivisionError):
+            return 1e10
+
+    def solve(self, O_bounds: Tuple[float, float] = (-10.0, 10.0)) -> Tuple[float, float]:
+        """
+        求解最优 O_L，使 IW 匹配目标值。
+        
+        Returns
+        -------
+        best_O_L : float
+            最优的 O_L 值
+        min_residual : float
+            最小残差
         """
         result = minimize_scalar(
             self._residual,
             bounds=O_bounds,
             method="bounded",
-            options={"xatol": tol, "maxiter": max_iter}
+            options={
+                "xatol": self.outer_tol,
+                "maxiter": self.max_outer_iter
+            }
         )
+        
+        # ── 如果优化失败，使用缓存的最优解
+        if self._cached_result is None:
+            print("  Warning: Optimization did not produce valid results. "
+                  "Check O_bounds or parameters.")
+            return result.x, result.fun
+        
         return result.x, result.fun
+
+    def get_final_result(self) -> Tuple[Dict[str, float], float]:
+        """
+        获取最优 O_L 下的求解结果。
+        
+        Returns
+        -------
+        res_dict : dict
+            求解结果 (x_, y_, z_, a_, b_, c_, d_, 等)
+        IW_final : float
+            最终的 IW 值
+            
+        Raises
+        ------
+        RuntimeError
+            如果 solve() 尚未被调用或无有效缓存
+        """
+        if self._cached_result is None:
+            raise RuntimeError(
+                "No cached result. Call solve() first to compute the optimal O_L. "
+                "If solve() was called but failed, check error messages above."
+            )
+        res_dict, IW_final = self._cached_result
+        return res_dict, IW_final
 #**************************************************************************************************************************************

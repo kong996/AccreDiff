@@ -1,6 +1,6 @@
 # accrediff/__init__.py
 
-__version__ = "0.2.0"
+__version__ = "0.4.0"
 __author__ = "Zhihui Kong"
 __email__ = "kongzh0508@163.com"
 
