@@ -12,8 +12,9 @@ model = build_model(cfg)
 result = model["integrator"].integrate_full(e0=0.05)
 """
 
-from dataclasses import dataclass
-import numpy as np # type ignore
+from dataclasses import dataclass,field
+from typing import Optional 
+import numpy as np # type: ignore
 
 
 # =========================================================
@@ -43,7 +44,7 @@ class Gas_ModelConfig:
     AU_in_cm: float = 1.495978707e13
     Msun_in_g: float = 1.98847e33
     Sigma0_cgs: float = 1600.0  # g/cm^2
-    Sigma0_code = 0.0 # 将在 __post_init__ 中计算
+    Sigma0_code: float = field(init=False, default=0.0)  # ✅ 改为正式 dataclass 字段
 
     # ---- gas disk decay ----
     tau_decay_myr: float = 2.0
@@ -95,7 +96,7 @@ class Gas_DiskModel:
       H/r = def_h_1 * r^beta
     """
 
-    def __init__(self, cfg: Gas_ModelConfig, units: Gas_UnitSystem | None = None):
+    def __init__(self, cfg: Gas_ModelConfig, units: Optional['Gas_UnitSystem'] = None):
         self.cfg   = cfg
         self.units = units or Gas_UnitSystem()
         self.tau_decay_code = self.units.myr_to_code(cfg.tau_decay_myr)
@@ -266,7 +267,7 @@ class Gas_MigrationIntegrator:
     阻尼公式来自 Cresswell & Nelson (2008) [CN08]。
     """
 
-    def __init__(self, cfg: Gas_ModelConfig, torque_model: Gas_TorqueModel, units: Gas_UnitSystem | None = None):
+    def __init__(self, cfg: Gas_ModelConfig, torque_model: Gas_TorqueModel, units: Optional[Gas_UnitSystem] = None):
         self.cfg    = cfg
         self.torque = torque_model
         self.units  = units or Gas_UnitSystem()

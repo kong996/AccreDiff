@@ -38,6 +38,7 @@ from .differentiation import (
     EarlyComUpdater,
     ForwardKDOSolver,
     OLSolver,
+    IWCompositionCalculator_v2,
 )
 
 # --- Melt scaling (Nakajima et al. 2021 style) ---
@@ -51,7 +52,7 @@ from .utils import (
     compute_error_metrics, 
     WeightedECDF)
                     
-#from .plotting import images_to_video
+
 # --- Gas disk migration (Cresswell & Nelson 2008) ---
 from .gas_migration import (
     Gas_ModelConfig,
@@ -62,6 +63,9 @@ from .gas_migration import (
     Gas_MigrationIntegrator,
     Gas_build_model,
     #Gas_build_model_v2,
+)
+from .plotting import (
+    plot_IW_heatmap,
 )
 __all__ = [
     "__version__",
@@ -92,6 +96,7 @@ __all__ = [
     "EarlyComUpdater",
     "ForwardKDOSolver",
     "OLSolver",
+    "IWCompositionCalculator_v2",
     # gas migration
     "Gas_ModelConfig",
     "Gas_UnitSystem",
@@ -112,4 +117,6 @@ __all__ = [
     #"generate_migration_map_v2",
     #"plot_migration_map_v2",
     # "images_to_video",
+    # plotting
+    "plot_IW_heatmap",
 ]

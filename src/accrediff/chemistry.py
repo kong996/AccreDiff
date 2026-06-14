@@ -164,7 +164,7 @@ def compute_IW(x_=None, a_=None, y_=None, b_=None, z_=None, c_=None, d_=None, u=
     n  = n  if n  is not None else kwargs.get('n')
 
     X_FeO  = x_ / (x_ + y_ + z_ + u + m + n)
-    X_MW_FeO = 1.148 * X_FeO + 1.319 * (X_FeO ** 2)
+    #X_MW_FeO = 1.148 * X_FeO + 1.319 * (X_FeO ** 2)
     X_Fe = a_ / (a_ + b_ + c_ + d_)
     return 2 * np.log10(X_FeO / X_Fe)
 #**************************************************************************************************************************************

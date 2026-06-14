@@ -5,6 +5,7 @@ from dataclasses import dataclass, replace
 from typing import Literal, Optional, Tuple, Dict, Callable, Any
 import math
 import copy
+from .chemistry import KDCalculator 
 #from .utils import power_law
 from scipy.optimize import minimize_scalar  # type: ignore
 
@@ -84,15 +85,13 @@ def P_to_T(P):
 class EarlyComUpdater:
     """
     用于批量更新early_com DataFrame中各粒子的化学参数。
-    依赖自定义库 wisdom (import wisdom as wd)。
     """
-    def __init__(self, df, dict_com, keys_list, accrediff, m_ratio=True, 
+    def __init__(self, df, dict_com, keys_list, m_ratio=True, 
                  KD_oxygen: Literal["Rubie", "Fischer"] = "Rubie"  # 修改：加 Literal 类型注解
                  ):
         self.df = df
         self.dict_com  = dict_com
         self.keys_list = keys_list
-        self.accrediff = accrediff
         self.m_ratio = m_ratio
         self.KD_oxygen = KD_oxygen
         # 自动获取所有成分类型（如['IW15','IW35']），无需硬编码
@@ -131,7 +130,7 @@ class EarlyComUpdater:
         Si_total = bulk['SiO2'] + bulk['Si']
         O_L = bulk['Fe'] + bulk['Ni'] + 2 * bulk['Si'] - bulk['O']
         # 计算 KD
-        kd_calc = self.accrediff.KDCalculator()
+        kd_calc = KDCalculator()
         KD_Ni = kd_calc.get_KD('Ni', P, T)
         KD_Si = kd_calc.get_KD('Si', P, T)
         KD_O = kd_calc.get_KD('O', P, T)
@@ -147,8 +146,8 @@ class EarlyComUpdater:
             "m": Al_total,
             "n": Ca_total,
         }
-        p0 = self.accrediff.KD_Params(**params_dict)
-        solver = self.accrediff.ForwardKDOSolver(
+        p0 = KD_Params(**params_dict)
+        solver = ForwardKDOSolver(
             p0,
             nonneg='clip',
             enforce_z_box=True,
@@ -756,3 +755,244 @@ class OLSolver:
         res_dict, IW_final = self._cached_result
         return res_dict, IW_final
 #**************************************************************************************************************************************
+class IWCompositionCalculator_v2:
+    """
+    计算 N-body 模拟快照中每个粒子的 ΔIW 氧逸度缓冲值。
+
+    相比 v1 新增：支持传入 core_data (JSON) 覆盖大质量粒子的矿物成分，
+    覆盖后重算 ΔIW。
+
+    Parameters
+    ----------
+    A_dict            : dict          快照字典，键为时间标签
+    C_data            : pd.DataFrame  完整碰撞记录
+    snapshot_times    : dict          时间标签 → 快照时间戳
+    df_initial        : pd.DataFrame  初始粒子信息（含 'com', 'm_e'）
+    i_com_mapping     : dict          粒子索引 → 初始成分类型
+    composition_types : list          成分类型列表，例如 ['EF', 'EC', 'OC', 'CI']
+    major_items       : list          矿物成分列表，例如 ['FeO', 'MgO', ...]
+    dict_Mete         : dict          陨石成分归一化字典
+    """
+
+    def __init__(
+        self,
+        A_dict,
+        C_data,
+        snapshot_times,
+        df_initial,
+        i_com_mapping,
+        composition_types,
+        major_items,
+        dict_Mete,
+    ):
+        self.A_dict            = A_dict
+        self.C_data            = C_data
+        self.snapshot_times    = snapshot_times
+        self.df_initial        = df_initial
+        self.i_com_mapping     = i_com_mapping
+        self.composition_types = composition_types
+        self.major_items       = major_items
+        self.dict_Mete         = dict_Mete
+
+    # ── 静态方法：计算 ΔIW ─────────────────────────────────────
+    @staticmethod
+    def _compute_IW(df_snap_all):
+        """
+        计算 ΔIW = 2·log10(X_FeO / X_Fe)
+
+        X_FeO : FeO 在硅酸盐相中的摩尔分数
+        X_Fe  : Fe  在金属相中的摩尔分数
+        """
+        X_FeO = df_snap_all['FeO'] / (
+            df_snap_all[['MgO', 'CaO', 'FeO', 'NiO', 'SiO2']].sum(axis=1)
+            + 2 * df_snap_all['Al2O3']
+        )
+        X_Fe = df_snap_all['Fe'] / df_snap_all[['Fe', 'Ni', 'Si', 'O']].sum(axis=1)
+        return 2 * np.log10(X_FeO / X_Fe)
+
+    # ── 私有方法：粒子分类 ─────────────────────────────────────
+    def _classify_particles(self, selected_time):
+        """筛选该时刻碰撞记录，并将快照粒子分为碰撞/未碰撞两组。"""
+        C_snap           = self.C_data[self.C_data['time'] <= self.snapshot_times[selected_time]]
+        collision_id_set = set(C_snap['indexi']) | set(C_snap['indexj'])
+
+        df_snap      = self.A_dict[selected_time][['a', 'e', 'inc', 'm_e']].iloc[2:].copy()
+        snap_idx_set = set(df_snap.index)
+
+        for col in self.composition_types:
+            df_snap[col] = np.nan
+
+        intersection_list = list(snap_idx_set & collision_id_set)
+        original_list     = list(snap_idx_set - collision_id_set)
+
+        return (
+            df_snap.loc[intersection_list].copy(),
+            df_snap.loc[original_list].copy(),
+            C_snap,
+        )
+
+    # ── 私有方法：未碰撞粒子继承初始成分 ──────────────────────
+    def _fill_original_composition(self, df_snap_original):
+        """未碰撞粒子直接从初始状态继承成分。"""
+        for idx in df_snap_original.index:
+            com_type = self.df_initial.loc[idx, 'com']
+            if com_type in self.composition_types:
+                df_snap_original.at[idx, com_type] = self.df_initial.loc[idx, 'm_e']
+        return df_snap_original
+
+    # ── 私有方法：碰撞粒子追溯前体成分 ───────────────────────
+    def _fill_collision_composition(self, df_snap_collision, C_snap):
+        from .accretion import CollisionTracer  # ✅ 延迟导入，避免循环
+        """利用 CollisionTracer 追溯碰撞历史，按前体成分类型求和。"""
+        if df_snap_collision.empty or C_snap.empty:
+            return df_snap_collision
+
+        df_c   = C_snap[['time', 'indexi', 'm_ei', 'indexj', 'm_ej']].copy()
+        tracer = CollisionTracer(df_c)
+
+        for idx in df_snap_collision.index:
+            h            = tracer.trace_full_history(idx)
+            index_union  = list(set(h['indexi']) | set(h['indexj']))
+
+            union_df = pd.DataFrame([
+                {
+                    'Index':    index,
+                    'Category': self.i_com_mapping.get(index, None),
+                    'm_e':      self.df_initial.loc[index, 'm_e']
+                                if index in self.df_initial.index else None,
+                }
+                for index in index_union
+            ])
+
+            category_sums = union_df.groupby('Category')['m_e'].sum()
+            for com_type in self.composition_types:
+                if com_type in category_sums.index:
+                    df_snap_collision.at[idx, com_type] = category_sums[com_type]
+
+        return df_snap_collision
+
+    # ── 私有方法：合并、计算 P/T/矿物成分/IW ──────────────────
+    def _merge_and_compute(self, df_snap_collision, df_snap_original):
+        """合并两组粒子，依次计算成分比例、P、T、矿物成分和 ΔIW。"""
+        df_snap_all = (
+            pd.concat([df_snap_collision, df_snap_original])
+            .sort_values('m_e')
+            .reset_index()
+        )
+
+        # 填充缺失成分
+        for col in self.composition_types:
+            df_snap_all[col] = df_snap_all[col].fillna(0)
+
+        # 成分质量比例
+        total = df_snap_all[self.composition_types].sum(axis=1).replace(0, np.nan)
+        for col in self.composition_types:
+            df_snap_all[f'{col}_ratio'] = df_snap_all[col] / total
+
+        # 压力 & 温度
+        df_snap_all['P'] = Early_pressure(df_snap_all['m_e'])
+        df_snap_all['T'] = df_snap_all['P'].apply(P_to_T)
+
+        # 矿物成分更新
+        for col in self.major_items:
+            df_snap_all[col] = np.nan
+        updater = EarlyComUpdater(df_snap_all, self.dict_Mete, self.major_items)
+        updater.batch_update()
+
+        # ΔIW
+        df_snap_all['IW'] = self._compute_IW(df_snap_all)
+
+        return df_snap_all
+
+    # ── 私有方法：用 JSON 核形成数据覆盖矿物成分 ──────────────
+    def _override_with_json_data(self, df_snap_all, selected_time, core_data):
+        """
+        将 core_data (JSON) 中的矿物成分覆盖到 df_snap_all 对应粒子，并重算 ΔIW。
+
+        策略：
+          1. 展开所有记录 → DataFrame，保留含完整矿物字段的行
+          2. 按 Time 升序排列，筛选 Time ≤ t_snap
+          3. 每个 target_id 取 Time 最近（最大）的记录
+          4. 按 target_id 匹配 df_snap_all['index'] 完成覆盖
+          5. 重算 ΔIW
+
+        Parameters
+        ----------
+        df_snap_all   : pd.DataFrame  _merge_and_compute 输出的粒子表
+        selected_time : str           时间标签，例如 '5.0 Myr'
+        core_data     : dict          由 JSON 加载的核形成数据
+        """
+        t_snap_yr       = self.snapshot_times[selected_time]
+        t_snap_Myr = t_snap_yr / 1e6
+        mineral_cols = ['MgO', 'Al2O3', 'CaO', 'FeO', 'NiO', 'SiO2', 'Fe', 'Ni', 'Si', 'O']
+
+        # ── Step1: 展开 JSON → DataFrame，过滤不完整记录 ────────
+        rows = []
+        for records in core_data.values():
+            for r in records:
+                if 'target_id' in r and 'MgO' in r:
+                    rows.append(r)
+
+        if not rows:
+            print("  ⚠ core_data 中无完整矿物记录，跳过覆盖")
+            return df_snap_all
+
+        df_json = pd.DataFrame(rows).sort_values('Time')
+
+        # ── Step2: 筛选 Time ≤ t_snap ───────────────────────────
+        df_valid = df_json[df_json['Time'] <= t_snap_Myr]
+
+        if df_valid.empty:
+            print(f"  ⚠ t_snap={t_snap_Myr:.1f} Myr 之前无可用记录，跳过覆盖")
+            return df_snap_all
+
+        # ── Step3: 每个 target_id 取 Time 最大的记录 ────────────
+        df_latest = (
+            df_valid
+            .sort_values('Time')
+            .groupby('target_id', as_index=False)
+            .last()
+        )
+
+        # ── Step4: 覆盖 df_snap_all 对应粒子的矿物成分 ──────────
+        n_updated = 0
+        for _, row in df_latest.iterrows():
+            pid  = int(row['target_id'])
+            mask = df_snap_all['i'] == pid
+            if not mask.any():
+                continue
+            for col in mineral_cols:
+                if col in row and pd.notna(row[col]):
+                    df_snap_all.loc[mask, col] = row[col]
+            n_updated += 1
+
+        # ── Step5: 重算 ΔIW ─────────────────────────────────────
+        df_snap_all['IW'] = self._compute_IW(df_snap_all)
+        print(f"  ✓ JSON 覆盖: {n_updated} 个粒子更新完成 (t_snap={t_snap_Myr:.1f} Myr)")
+
+        return df_snap_all
+
+    # ── 公开方法：主入口 ───────────────────────────────────────
+    def compute(self, selected_time, core_data=None):
+        """
+        计算指定时刻每个粒子的成分组成、P、T 和 ΔIW。
+
+        Parameters
+        ----------
+        selected_time : str           时间标签，例如 '5.0 Myr'
+        core_data     : dict | None   由 JSON 加载的核形成数据；
+                                      传入则用其覆盖矿物成分，None 则跳过
+
+        Returns
+        -------
+        pd.DataFrame  包含成分比例、P、T、IW 等列
+        """
+        df_collision, df_original, C_snap = self._classify_particles(selected_time)
+        df_original  = self._fill_original_composition(df_original)
+        df_collision = self._fill_collision_composition(df_collision, C_snap)
+        df_snap_all  = self._merge_and_compute(df_collision, df_original)
+
+        if core_data is not None:
+            df_snap_all = self._override_with_json_data(df_snap_all, selected_time, core_data)
+
+        return df_snap_all
