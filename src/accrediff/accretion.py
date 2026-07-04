@@ -109,6 +109,9 @@ class CollisionTracer:
         visited.clear()
         trace_descendants(particle_id)
 
+        if not full_history:
+            return pd.DataFrame(columns=['time', 'indexi', 'm_ei', 'indexj', 'm_ej', 'product_id'])
+
         return pd.DataFrame(full_history).drop_duplicates().sort_values(by="time").reset_index(drop=True)
 #**************************************************************************************************************************************
 def resolve_product_id(row):

@@ -851,7 +851,16 @@ class IWCompositionCalculator_v2:
         tracer = CollisionTracer(df_c)
 
         for idx in df_snap_collision.index:
-            h            = tracer.trace_full_history(idx)
+            h = tracer.trace_full_history(idx)
+
+            # ── 处理空历史：粒子参与了碰撞但从未成为幸存产物(product_id)，
+            #    无法追溯前体，回退到初始成分 ──────────────────
+            if h.empty:
+                com_type = self.i_com_mapping.get(idx, None)
+                if com_type in self.composition_types:
+                    df_snap_collision.at[idx, com_type] = self.df_initial.loc[idx, 'm_e']
+                continue
+
             index_union  = list(set(h['indexi']) | set(h['indexj']))
 
             union_df = pd.DataFrame([
