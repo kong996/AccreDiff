@@ -2,21 +2,15 @@
 import numpy as np # type: ignore
 import re # type: ignore
 from typing import Optional 
+
+from .constant import Elements
 #**************************************************************************************************************************************
 class MolarMassCalculator:
     """简单化合物摩尔质量计算器（不含括号/点号）"""
 
-    # 默认摩尔质量表
-    DEFAULT_MASS_TABLE = {
-        "H": 1.00794,
-        "O": 15.999,
-        "Si": 28.0855,
-        "Al": 26.9815385,
-        "Mg": 24.305,
-        "Ca": 40.078,
-        "Fe": 55.845,
-        "Ni": 58.6934,
-    }
+    # 项目唯一的默认原子量数据源。实例仍持有副本，避免调用者修改
+    # ``mass_table`` 时污染 ``constant.Elements``。
+    DEFAULT_MASS_TABLE = Elements
 
     _TOKEN = re.compile(r"([A-Z][a-z]?)(\d*)")  # 元素符号+可选数字
 

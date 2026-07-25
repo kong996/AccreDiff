@@ -27,6 +27,15 @@ from .accretion import (
     update_partial_melting_process,
 )
 
+# --- Collision outcomes (EDACM-style classifier) ---
+from .collision_outcomes import (
+    CollisionOutcome,
+    EDACMConfig,
+    add_collision_outcomes,
+    classify_edacm_outcomes,
+    impact_parameter_from_angle,
+)
+
 # --- Differentiation ---
 from .differentiation import (
     KD_Params,
@@ -39,6 +48,37 @@ from .differentiation import (
     ForwardKDOSolver,
     OLSolver,
     IWCompositionCalculator_v2,
+)
+from .differentiation_sulfur import (
+    MA2001_FE_S_NI_EPSILON_1873K,
+    MA2001_FE_S_NI_GAMMA0_1873K,
+    MA2001_EPSILON_REFERENCE_T_K,
+    MA2001_EPSILON_TEMPERATURE_SCALING,
+    GAMMA_FEO_SILICATE,
+    MODEL_ASSUMPTIONS,
+    SulfurSolverError,
+    PhysicalStateError,
+    AmbiguousPhysicalRootError,
+    NiPartitionNotReachableError,
+    SulfurPartitionNotReachableError,
+    OxygenKDNotReachableError,
+    IWTargetNotReachableError,
+    SulfurResidualReport,
+    audit_physical_state,
+    Ma2001TernaryActivity,
+    SulfurKDCalculator,
+    SulfurKDParams,
+    SulfurKDResult,
+    SUPPLEMENT_MAJOR_KD_PARAMS,
+    supplement_major_kd,
+    D_S_model_molar,
+    D_S_model_rose_weston_molar,
+    ForwardKDOSolverSulfur,
+    SulfurOLSolver,
+    make_sulfur_solver_factory,
+    sulfur_model_for_event,
+    sulfur_params_from_composition,
+    SulfurDifferentiationEventDriver,
 )
 
 # --- Melt scaling (Nakajima et al. 2021 style) ---
@@ -86,6 +126,12 @@ __all__ = [
     "resolve_product_id",
     "build_pl_source_dict",
     "update_partial_melting_process",
+    # collision outcomes
+    "CollisionOutcome",
+    "EDACMConfig",
+    "add_collision_outcomes",
+    "classify_edacm_outcomes",
+    "impact_parameter_from_angle",
     # differentiation
     "KD_Params",
     "KD_Result",
@@ -97,6 +143,35 @@ __all__ = [
     "ForwardKDOSolver",
     "OLSolver",
     "IWCompositionCalculator_v2",
+    "MA2001_FE_S_NI_EPSILON_1873K",
+    "MA2001_FE_S_NI_GAMMA0_1873K",
+    "MA2001_EPSILON_REFERENCE_T_K",
+    "MA2001_EPSILON_TEMPERATURE_SCALING",
+    "GAMMA_FEO_SILICATE",
+    "MODEL_ASSUMPTIONS",
+    "SulfurSolverError",
+    "PhysicalStateError",
+    "AmbiguousPhysicalRootError",
+    "NiPartitionNotReachableError",
+    "SulfurPartitionNotReachableError",
+    "OxygenKDNotReachableError",
+    "IWTargetNotReachableError",
+    "SulfurResidualReport",
+    "audit_physical_state",
+    "Ma2001TernaryActivity",
+    "SulfurKDCalculator",
+    "SulfurKDParams",
+    "SulfurKDResult",
+    "SUPPLEMENT_MAJOR_KD_PARAMS",
+    "supplement_major_kd",
+    "D_S_model_molar",
+    "D_S_model_rose_weston_molar",
+    "ForwardKDOSolverSulfur",
+    "SulfurOLSolver",
+    "make_sulfur_solver_factory",
+    "sulfur_model_for_event",
+    "sulfur_params_from_composition",
+    "SulfurDifferentiationEventDriver",
     # gas migration
     "Gas_ModelConfig",
     "Gas_UnitSystem",
