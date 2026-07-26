@@ -83,6 +83,7 @@ ENV/
 # data/
 notebooks/
 GMD2026_v1/
+sulfur_test/
 trace_test/
 ####################################
 # Build artifacts

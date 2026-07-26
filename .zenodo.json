@@ -1,0 +1,27 @@
+{
+  "title": "AccreDiff v1.0.0: a modular framework for coupling planetary accretion and core-mantle differentiation",
+  "upload_type": "software",
+  "description": "AccreDiff is a Python framework for coupling N-body accretion histories with event-by-event core-mantle differentiation calculations for terrestrial planet formation.",
+  "creators": [
+    {
+      "name": "Kong, Zhihui",
+      "affiliation": "Zhejiang University"
+    }
+  ],
+  "license": "MIT",
+  "keywords": [
+    "planet formation",
+    "accretion",
+    "core-mantle differentiation",
+    "metal-silicate partitioning",
+    "geochemistry",
+    "N-body simulation"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/kong996/AccreDiff",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}

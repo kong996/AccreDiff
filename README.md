@@ -1,175 +1,218 @@
-# 🪐 AccreDiff
+# AccreDiff
 
-**AccreDiff** is an open-source Python framework for coupling  
-**N-body accretion histories** with **core–mantle differentiation models**.
+AccreDiff is an open-source Python framework for coupling N-body accretion
+histories with multi-stage core-mantle differentiation calculations for
+terrestrial planet formation.
 
-It provides a modular, reproducible, and extensible toolkit for studying
-the chemical evolution of terrestrial planets.
+The project is developed as a reproducible model-workflow package for the GMD
+model-description paper:
 
-AccreDiff is designed for community use and collaborative development.
+> AccreDiff v1.0.0: a modular framework for coupling planetary accretion and
+> core-mantle differentiation
 
----
+## Main Capabilities
 
-## Overview
+AccreDiff provides tools to:
 
-AccreDiff enables researchers to:
+- read and process GENGA-like N-body accretion outputs;
+- reconstruct collision histories, parent-product relationships, and source
+  reservoir fractions;
+- initialize cosmochemical compositions from CI-based or meteoritic-reservoir
+  prescriptions;
+- assign impact regimes and pressure-temperature equilibration conditions;
+- perform event-by-event metal-silicate differentiation;
+- track mantle and core inventories, redox state, bulk composition, and core
+  mass fraction;
+- run extension examples for gas-disk migration, collision-outcome
+  classification, and Fe-Ni-S sulfur-bearing differentiation.
 
-- Load N-body simulation outputs (e.g., GENGA)
-- Extract and process impact histories
-- Apply metal–silicate equilibration models
-- Track core–mantle compositional evolution
-- Control redox evolution (ΔIW-based models)
-- Analyze and compare planetary analogs
-- Generate publication-ready visualizations
-
-The framework separates physical models from workflow logic, allowing
-new differentiation models or partitioning laws to be integrated easily.
-
----
-
-## Design Principles
-
-AccreDiff is built around:
-
-- **Modularity** — Physical models are interchangeable.
-- **Reproducibility** — All parameters are controlled via configuration files.
-- **Transparency** — No hidden constants; all assumptions are explicit.
-- **Extensibility** — Designed for future community contributions.
-
----
+AccreDiff is a post-processing and coupled geochemical evolution framework. It
+does not recompute N-body dynamics and does not solve hydrodynamic impact
+physics directly.
 
 ## Installation
 
-Clone the repository and install dependencies:
+AccreDiff requires Python 3.10 or later.
+
+Clone the repository:
 
 ```bash
 git clone https://github.com/kong996/AccreDiff.git
 cd AccreDiff
-pip install -r requirements.txt
 ```
 
-Or install in editable mode for development:
+Install the package in editable mode:
 
 ```bash
 pip install -e .
 ```
 
-### Requirements
+For development and example notebooks, install the optional dependencies:
 
-- Python ≥ 3.8
-- numpy ≥ 1.21.0
-- scipy ≥ 1.7.0
-- pandas ≥ 1.3.0
-- matplotlib ≥ 3.4.0
-- pyyaml ≥ 6.0
-- jupyter ≥ 1.0.0
-- ipykernel ≥ 6.0.0
-- ipywidgets ≥ 7.6.0
-- tqdm ≥ 4.62.0
+```bash
+pip install -e ".[dev,examples]"
+```
 
----
+Alternatively, create a conda environment:
+
+```bash
+conda env create -f environment.yml
+conda activate accrediff
+```
+
+## Quick Verification
+
+Run the test suite from the repository root:
+
+```bash
+python -m pytest -q
+```
+
+Build the source and wheel distributions:
+
+```bash
+python -m build --sdist --wheel
+```
+
+Check the installed package version:
+
+```bash
+python -c "import accrediff as ad; print(ad.__version__)"
+```
+
+For the GMD release described in the paper, this should print:
+
+```text
+1.0.0
+```
 
 ## Project Structure
 
-```
+```text
 AccreDiff/
-├── src/
-│   └── accrediff/          # Core Python package
-├── examples/               # Example workflows & tutorial notebooks
-│   ├── quickstart/         # Step-by-step tutorial notebooks
-│   ├── basics/             # Basic usage notebooks
-│   └── dataset/            # Example datasets
-├── notebooks/              # Additional Jupyter Notebooks
-├── tests/                  # Unit tests
-├── requirements.txt
-├── pyproject.toml
+├── src/accrediff/                    # Core Python package
+├── examples/                         # Reproducible example workflows
+│   ├── quickstart/                   # Seven-step end-to-end workflow
+│   ├── Cosmochemistry/               # Cosmochemical initialization examples
+│   ├── Accrection/                   # Accretion reconstruction examples
+│   ├── Impact/                       # Impact-regime examples
+│   ├── Differentiation/              # Core-mantle differentiation examples
+│   ├── Outcome_analysis/             # Diagnostic post-processing examples
+│   ├── Expansion_module/             # Extension-module demonstrations
+│   └── dataset/                      # Bundled demonstration datasets
+├── tests/                            # Unit tests
+├── docs/                             # Manuscript-support notes and documents
+├── CITATION.cff                      # Software citation metadata
+├── .zenodo.json                      # Zenodo archive metadata
+├── CHANGELOG.md                      # Release notes
+├── environment.yml                   # Conda environment for examples/tests
+├── pyproject.toml                    # Package metadata
 └── README.md
 ```
 
----
+The directory name `examples/Accrection/` is retained for compatibility with
+the distributed notebooks and manuscript paths.
 
-## Quick Start
+## Example Workflows
 
-The recommended way to get started is through the step-by-step quickstart notebooks.  
-Each notebook builds on the previous one and covers a complete accretion–differentiation workflow:
+The recommended starting point is the quickstart workflow. The notebooks are
+designed to be run in order:
 
-| Notebook | Description |
-|----------|-------------|
-| [`01_Constants_and_setup.ipynb`](examples/quickstart/01_Constants_and_setup.ipynb) | Load built-in constants, element tables, and meteorite / planet reference compositions |
-| [`02_Meteorite_bulk_composition.ipynb`](examples/quickstart/02_Meteorite_bulk_composition.ipynb) | Convert wt% → molar, normalize to MgO & CI, export to CSV |
-| [`03_Embryo_bulk_composition.ipynb`](examples/quickstart/03_Embryo_bulk_composition.ipynb) | Reconstruct embryo bulk compositions at ~5 Myr from N-body collision histories |
-| [`04_Accrection_history.ipynb`](examples/quickstart/04_Accrection_history.ipynb) | Track mass evolution and reconstruct merger trees across 0–100 Myr |
-| [`05_Impact_events.ipynb`](examples/quickstart/05_Impact_events.ipynb) | Classify impact events (small / global / partial melting) and assign equilibration pressure |
-| [`06_Differentiation.ipynb`](examples/quickstart/06_Differentiation.ipynb) | Simulate multi-stage metal–silicate differentiation using K_D equilibrium solver |
-| [`07_Comparison_bulk.ipynb`](examples/quickstart/07_Comparison_bulk.ipynb) | Compare modeled planet compositions against Earth & Mars reference values |
+| Notebook | Purpose |
+| --- | --- |
+| `examples/quickstart/01_Constants_and_setup.ipynb` | Load constants and reference compositions |
+| `examples/quickstart/02_Meteorite_bulk_composition.ipynb` | Build meteoritic endmember compositions |
+| `examples/quickstart/03_Embryo_bulk_composition.ipynb` | Reconstruct embryo compositions |
+| `examples/quickstart/04_Accrection_history.ipynb` | Reconstruct planetary accretion histories |
+| `examples/quickstart/05_Impact_events.ipynb` | Assign impact regimes and equilibration pressure |
+| `examples/quickstart/06_Differentiation.ipynb` | Run multi-stage core-mantle differentiation |
+| `examples/quickstart/07_Comparison_bulk.ipynb` | Compare final model outputs with reference compositions |
 
-A minimal usage example:
+Additional module-specific examples are provided in:
+
+- `examples/Cosmochemistry/`
+- `examples/Accrection/`
+- `examples/Impact/`
+- `examples/Differentiation/`
+- `examples/Outcome_analysis/`
+- `examples/Expansion_module/gas_disk/`
+- `examples/Expansion_module/collision_detail/`
+- `examples/Expansion_module/Fe_Ni_S_ternary/`
+
+Each example folder includes a README describing its inputs, outputs, and main
+AccreDiff APIs.
+
+## Minimal Usage
 
 ```python
 import accrediff as ad
 
-# Load built-in constants and reference compositions
-elements  = ad.constants.Elements
-earth     = ad.constants.Earth
-ci        = ad.constants.CI_bulk
+print(ad.__version__)
 
-# Load N-body snapshots (GENGA .aei format)
-A_dict = ad.load_aei_snapshots("examples/dataset/N_body_dataset/")
+elements = ad.constants.Elements
+earth = ad.constants.Earth
+ci = ad.constants.CI_bulk
 
-# Trace collision history and compute embryo compositions at 5 Myr
-tracer   = ad.CollisionTracer(A_dict)
-df_embryo = tracer.get_composition_at(t_myr=5.0)
-
-# Classify impact events and assign equilibration pressure
-processor = ad.ImpactEventProcessor(df_embryo)
-data_dict = processor.run()
-
-# Run multi-stage differentiation
-df_result = ad.run_differentiation(data_dict)
+mm = ad.MolarMassCalculator()
+mg_o_mass = mm.molar_mass("MgO")
+print(mg_o_mass)
 ```
 
-> 💡 For the full annotated walkthrough, open the notebooks in [`examples/quickstart/`](examples/quickstart/).
+For complete workflows, use the notebooks in `examples/quickstart/`.
 
----
+## Extension Modules
 
-## Physical Models
+AccreDiff v1.0.0 includes prototype extension modules that demonstrate the
+intended modular interface:
 
-### Metal–Silicate Equilibration
+- `src/accrediff/gas_migration.py`: Python-side gas-disk migration and torque
+  diagnostics, with a GENGA-compatible CUDA configuration example in
+  `examples/dataset/gas_config/gas.cu`.
+- `src/accrediff/collision_outcomes.py`: EDACM-style collision-outcome
+  diagnostics for GENGA-like collision records.
+- `src/accrediff/differentiation_sulfur.py`: standalone Fe-Ni-S
+  metal-silicate differentiation extension with Rose-Weston and Boujibar sulfur
+  partitioning examples.
 
-AccreDiff implements pressure- and temperature-dependent partition coefficients
-following the approach of Fischer et al. (2015) and Rubie et al. (2015).
-Equilibration depth is treated as a free parameter or derived from impact scaling laws.
+These modules are distributed as extension examples rather than mandatory parts
+of every default workflow.
 
-### Redox Evolution (ΔIW)
+## Citation
 
-Oxygen fugacity is tracked relative to the Iron–Wüstite buffer (ΔIW).
-The framework supports both fixed-ΔIW and evolving-ΔIW scenarios.
+If you use AccreDiff, please cite the archived software release and the
+accompanying GMD model-description paper. Citation metadata are provided in
+`CITATION.cff`.
 
-### Accretion History Input
+After creating the GitHub release and Zenodo archive, cite the exact archived
+version, for example:
 
-Currently supported formats:
-- **GENGA** binary/text outputs
-- Custom CSV impact logs (see `data/format_spec.md`)
+```text
+Kong, Z.: AccreDiff v1.0.0: a modular framework for coupling planetary
+accretion and core-mantle differentiation, Zenodo [code],
+https://doi.org/10.5281/zenodo.XXXXXXX, 2026.
+```
 
----
+## GMD Release Checklist
 
----
+Before submitting the GMD discussion paper, the release should be frozen and
+archived:
+
+1. Confirm that `pyproject.toml` and `accrediff.__version__` both report
+   `1.0.0`.
+2. Run `python -m pytest -q`.
+3. Run `python -m build --sdist --wheel`.
+4. Create a GitHub release tagged `v1.0.0`.
+5. Archive the release on Zenodo and obtain a DOI.
+6. Add the Zenodo DOI to the manuscript code-availability section and, if
+   desired, to `CITATION.cff`.
 
 ## License
 
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
-
----
+AccreDiff is distributed under the MIT License. See `LICENSE` for details.
 
 ## Acknowledgements
 
-This framework draws on methodologies from:
-
-- Rubie et al. (2011), *Earth and Planetary Science Letters* — Heterogeneous accretion, composition and core–mantle differentiation of the Earth
-- Rubie et al. (2015), *Icarus* — Accretion and differentiation of the terrestrial planets with  implications for the compositions of early-formed Solar  System bodies and accretion of water
-- Fischer et al. (2017), *Earth and Planetary Science Letters* — Sensitivities of Earth’s core and mantle compositions to accretion and differentiation processes
-- Kong et al. (2026),*Astronomy and Astrophysics* - Coupling Dynamical Accretion and Chemical Differentiation: A Unified Framework for Earth--Mars Diversity (submit)
-
----
-
-*AccreDiff is actively developed. Feedback, issues, and pull requests are warmly welcomed.*
+AccreDiff draws on methods and parameterizations from planetary accretion,
+metal-silicate partitioning, impact physics, and cosmochemical reservoir
+studies. Key scientific references are discussed in the accompanying GMD
+manuscript and in the example notebooks.

@@ -1,0 +1,13 @@
+include LICENSE
+include README.md
+include CITATION.cff
+include CHANGELOG.md
+include .zenodo.json
+include environment.yml
+recursive-include src/accrediff/data *
+recursive-include examples *
+recursive-include docs *.md *.pdf
+recursive-include tests *.py
+global-exclude __pycache__/*
+global-exclude *.py[cod]
+global-exclude .DS_Store
