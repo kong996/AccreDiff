@@ -1,10 +1,10 @@
 """Independent Fe-Ni-S metal-silicate differentiation module.
 
-This module does not inherit numerical or data classes from
-``accrediff.differentiation``.  It intentionally retains the familiar field
-layout (``Fe_t`` ... ``n`` on input and ``x_`` ... ``residual`` on output) so
-existing accretion workflows can pass and consume compositions in the same
-shape without coupling the two implementations.
+This module has its own Fe-Ni-S equilibrium equations and result classes while
+retaining the familiar field layout (``Fe_t`` ... ``n`` on input and ``x_`` ...
+``residual`` on output).  In thorough mode, the sulfur-free solver supplies an
+optional FeO initial coordinate.  Its KD and phase amounts are never used as
+the sulfur result.
 
 The sulfur calculation contains two explicitly staged models:
 
@@ -34,7 +34,8 @@ import math
 from typing import Callable, Dict, Literal, Mapping, Optional, Sequence, Tuple
 
 import numpy as np
-from scipy.optimize import toms748
+import pandas as pd
+from scipy.optimize import least_squares, toms748
 
 from .chemistry import MolarMassCalculator
 from .constant import Elements
@@ -1062,13 +1063,21 @@ def D_S_model_molar(
 
 
 class ForwardKDOSolverSulfur:
-    """Strict nested Fe-Ni-S metal-silicate partition solver.
+    """Solve Fe-Ni-Si-O-S exchange with conservation and an independent audit.
 
-    Conserved amounts are never clipped or transformed.  For fixed FeO and
-    metal sulfur, NiO is obtained from a bounded root of the Ni exchange
-    equation.  Every Ni trial solves the Si exchange quadratic and rejects
-    roots that violate Si or O conservation.  Sulfur and oxygen exchange are
-    then solved on their own physical intervals.
+    Thorough mode first solves the bounded partition equations simultaneously.
+    Fe, Ni, Si, O, and S totals are built into its coordinates, and the result
+    is accepted only after checking phase amounts and exchange residuals.
+    If that trial fails, the solver searches connected physical intervals:
+    fixed FeO and sulfur trials solve Ni exchange and the Si quadratic before
+    searching sulfur and oxygen exchange.  Fast mode uses that nested search
+    directly.  Neither mode clips conserved totals to manufacture a solution.
+
+    In thorough mode, omitted Ni and sulfur tolerances default to 1e-9; fast
+    mode retains 1e-12.  ``direct_major_tol`` applies only to the simultaneous
+    Ni/Si audit.  Its 1e-6 default accommodates normalized Si residuals that
+    amplify floating-point changes when KD_Si is extremely small.  The oxygen
+    KD tolerance is supplied to ``solve_x_for_KD_O`` in log10 units.
 
     ``nonneg``, ``enforce_z_box`` and ``enforce_d_nonneg`` remain accepted
     only so existing callers do not break.  They no longer alter conserved
@@ -1083,11 +1092,11 @@ class ForwardKDOSolverSulfur:
         T: float,
         sulfur_model: SulfurModel,
         sulfur_kd_calculator: Optional[SulfurKDCalculator] = None,
-        sulfur_tol: float = 1e-12,
+        sulfur_tol: Optional[float] = None,
         sulfur_max_iter: int = 200,
         sulfur_grid_N: int = 20,
         coupled_max_iter: int = 100,
-        coupled_tol: float = 1e-12,
+        coupled_tol: Optional[float] = None,
         nonneg: Literal["clip", "softplus", "none"] = "clip",
         enforce_z_box: bool = False,
         enforce_d_nonneg: bool = False,
@@ -1095,7 +1104,8 @@ class ForwardKDOSolverSulfur:
         allow_nearest: bool = False,
         ni_grid_N: int = 24,
         physical_tol: float = 1e-12,
-        root_search: Literal["fast", "thorough"] = "fast",
+        direct_major_tol: float = 1e-6,
+        root_search: Literal["fast", "thorough"] = "thorough",
     ) -> None:
         if not math.isfinite(P) or P < 0.0:
             raise ValueError("Pressure must be finite and non-negative.")
@@ -1109,7 +1119,14 @@ class ForwardKDOSolverSulfur:
             raise ValueError("physical_mode must be 'strict' or 'diagnostic'.")
         if root_search not in {"fast", "thorough"}:
             raise ValueError("root_search must be 'fast' or 'thorough'.")
-        if sulfur_tol <= 0.0 or coupled_tol <= 0.0 or physical_tol <= 0.0:
+        if sulfur_tol is None:
+            sulfur_tol = 1e-9 if root_search == "thorough" else 1e-12
+        if coupled_tol is None:
+            coupled_tol = 1e-9 if root_search == "thorough" else 1e-12
+        if (
+            sulfur_tol <= 0.0 or coupled_tol <= 0.0 or physical_tol <= 0.0
+            or not math.isfinite(direct_major_tol) or direct_major_tol <= 0.0
+        ):
             raise ValueError("Convergence and physical tolerances must be positive.")
         if (
             sulfur_max_iter < 1
@@ -1133,6 +1150,7 @@ class ForwardKDOSolverSulfur:
         self.coupled_tol = float(coupled_tol)
         self.ni_grid_N = int(ni_grid_N)
         self.physical_tol = float(physical_tol)
+        self.direct_major_tol = float(direct_major_tol)
         self.physical_mode = physical_mode
         self.allow_nearest = bool(allow_nearest or physical_mode == "diagnostic")
         self.root_search = root_search
@@ -1147,10 +1165,9 @@ class ForwardKDOSolverSulfur:
             np.finfo(float).tiny,
         )
         self._amount_tol = self.physical_tol * self._inventory_scale
-        # Candidate filtering and final acceptance must use exactly the same
-        # dimensionless Si-equilibrium tolerance.  A separate polynomial
-        # residual previously made physical acceptance depend on warm-start
-        # evaluation order for ill-conditioned, very small KD_Si states.
+        # The nested Si filter and nested final audit share this threshold.
+        # The simultaneous solve has its own direct_major_tol for small-KD_Si
+        # states, whose normalized residual is sensitive to round-off.
         self._major_equilibrium_tol = max(self.coupled_tol, 1e-10)
         self._last_y_hint: Optional[float] = None
         self._last_s_log_ratio_hint: Optional[float] = None
@@ -1567,11 +1584,12 @@ class ForwardKDOSolverSulfur:
     ]:
         """Sample a bounded interval without joining across invalid states.
 
-        Fast mode evaluates both ends, the midpoint, and supplied warm-start
-        anchors. A bounded fallback scan is used only when those trials do not
-        locate a root. Thorough mode performs that scan immediately. Brackets
-        are formed only between adjacent attempted coordinates that are both
-        physical, so an observed invalid gap can never be crossed.
+        Fast mode evaluates both ends, the midpoint, and supplied anchors,
+        including earlier solutions. A bounded scan follows if needed.
+        Thorough mode scans immediately and does not use historical Ni/S
+        anchors, so a fixed trial is unaffected by probe order. Brackets are
+        formed only between adjacent physical attempts; an invalid gap is
+        never treated as a connected root interval.
         """
 
         attempted: Dict[
@@ -1752,8 +1770,19 @@ class ForwardKDOSolverSulfur:
             else 0.5 * p.Ni_t
         )
         anchors = [y_hint]
-        if self._last_y_hint is not None:
+        if self.root_search == "fast" and self._last_y_hint is not None:
             anchors.insert(0, self._last_y_hint)
+        # A physically admissible Ni interval may be much narrower than one
+        # global Ni_t/grid_N cell. Probe around the analytic, uncorrected NiO
+        # estimate before treating the interval as unreachable. These probes
+        # use only the current sulfur-model inputs, never a legacy solution.
+        for relative_offset in (0.01, 0.05, 0.1, 0.25, 0.5):
+            anchors.extend(
+                (
+                    y_hint * (1.0 - relative_offset),
+                    y_hint * (1.0 + relative_offset),
+                )
+            )
         search_subdivisions = self._effective_search_subdivisions(self.ni_grid_N)
         exact, brackets, valid_samples = self._discover_connected_roots(
             sample,
@@ -2057,6 +2086,7 @@ class ForwardKDOSolverSulfur:
         sulfur_iterations: int,
         sulfur_converged: bool,
         failure_reason: Optional[str] = None,
+        major_tol: Optional[float] = None,
     ) -> Dict[str, float]:
         state.update(
             sulfur_iterations=sulfur_iterations,
@@ -2077,8 +2107,9 @@ class ForwardKDOSolverSulfur:
             "Ni_equilibrium",
             "Si_equilibrium",
         )
+        major_limit = self._major_equilibrium_tol if major_tol is None else major_tol
         major_converged = report.physical and all(
-            abs(report.residuals[name]) <= self._major_equilibrium_tol
+            abs(report.residuals[name]) <= major_limit
             for name in major_names
         )
         physical_converged = report.physical
@@ -2154,7 +2185,7 @@ class ForwardKDOSolverSulfur:
             return q_value, state["sulfur_residual"], state
 
         anchors: list[float] = []
-        if self._last_s_log_ratio_hint is not None:
+        if self.root_search == "fast" and self._last_s_log_ratio_hint is not None:
             anchors.append(self._last_s_log_ratio_hint)
         # Most experimental D_S values correspond to |q| of order 1--20.
         # Geometric anchors expand to the machine-derived boundary, providing
@@ -2189,7 +2220,8 @@ class ForwardKDOSolverSulfur:
                     item[0]
                     - (
                         self._last_s_log_ratio_hint
-                        if self._last_s_log_ratio_hint is not None
+                        if self.root_search == "fast"
+                        and self._last_s_log_ratio_hint is not None
                         else 0.0
                     )
                 ),
@@ -2204,7 +2236,8 @@ class ForwardKDOSolverSulfur:
         if brackets:
             q_hint = (
                 self._last_s_log_ratio_hint
-                if self._last_s_log_ratio_hint is not None
+                if self.root_search == "fast"
+                and self._last_s_log_ratio_hint is not None
                 else 0.0
             )
             left, right = min(
@@ -2351,6 +2384,279 @@ class ForwardKDOSolverSulfur:
             model_assumptions=MODEL_ASSUMPTIONS,
         )
 
+    def _retry_oxygen_root_with_dense_ni(
+        self,
+        target: float,
+        *,
+        tol: float,
+        max_iter: int,
+        grid_N: int,
+        x_hint: Optional[float],
+    ) -> Optional[SulfurKDResult]:
+        """Retry a failed thorough FeO search with finer nested Ni roots."""
+
+        if self.root_search != "thorough" or self.ni_grid_N >= 100:
+            return None
+        retry = ForwardKDOSolverSulfur(
+            self.p,
+            P=self.P,
+            T=self.T,
+            sulfur_model=self.sulfur_model,
+            sulfur_kd_calculator=self.sulfur_kd_calculator,
+            sulfur_tol=self.sulfur_tol,
+            sulfur_max_iter=self.sulfur_max_iter,
+            sulfur_grid_N=self.sulfur_grid_N,
+            coupled_max_iter=self.coupled_max_iter,
+            coupled_tol=self.coupled_tol,
+            nonneg=self.nonneg,
+            enforce_z_box=self.enforce_z_box,
+            enforce_d_nonneg=self.enforce_d_nonneg,
+            physical_mode=self.physical_mode,
+            allow_nearest=self.allow_nearest,
+            ni_grid_N=100,
+            physical_tol=self.physical_tol,
+            direct_major_tol=self.direct_major_tol,
+            root_search=self.root_search,
+        )
+        try:
+            return retry.solve_x_for_KD_O(
+                target,
+                tol=tol,
+                max_iter=max_iter,
+                grid_N=grid_N,
+                x_hint=x_hint,
+            )
+        except OxygenKDNotReachableError:
+            return None
+
+    def _oxygen_seed_from_sulfur_free_limit(self, target: float) -> Optional[float]:
+        """Use the analytic major-element model only to locate a FeO trial.
+
+        The returned coordinate is never accepted as a sulfur solution; all
+        final phase amounts and residuals come from this strict solver.
+        """
+
+        try:
+            from .differentiation import ForwardKDOSolver, KD_Params
+
+            proxy = KD_Params(
+                Fe_t=self.p.Fe_t, Ni_t=self.p.Ni_t, Si_t=self.p.Si_t,
+                O_L=self.p.O_L, KD_Ni=self.p.KD_Ni, KD_Si=self.p.KD_Si,
+                u=self.p.u, m=self.p.m, n=self.p.n,
+            )
+            result = ForwardKDOSolver(
+                proxy,
+                nonneg="clip",
+                enforce_z_box=True,
+                enforce_d_nonneg=True,
+                KD_oxygen="Fischer",
+            ).solve_x_for_KD_O(target, tol=1e-8, grid_N=400)
+            return float(result.x_) if math.isfinite(result.x_) else None
+        except (ValueError, ArithmeticError, OverflowError):
+            return None
+
+    def _solve_direct_constrained_oxygen(
+        self,
+        target: float,
+        *,
+        tol: float,
+        x_hint: Optional[float],
+        sampled_states: Sequence[Tuple[float, float, Dict[str, float]]],
+    ) -> Optional[SulfurKDResult]:
+        """Independently solve all partition equations with bounded phases.
+
+        The coordinates are FeO, NiO, SiO2, and (when S is present) the log
+        metal/silicate sulfur ratio. The other phase amounts follow from Fe,
+        Ni, Si, O, and S conservation. Multiple bounded starts are tried.
+        A candidate is returned only after the independent physical audit and
+        the configured exchange-residual checks; optimizer success alone is
+        never evidence of convergence. ``None`` lets the nested search try a
+        different branch.
+        """
+
+        if self.root_search != "thorough" or self.allow_nearest:
+            return None
+        p = self.p
+        oxygen_total = self._total_O()
+        x_upper = min(p.Fe_t, oxygen_total)
+        if x_upper <= 0.0:
+            return None
+        q_limit = (
+            math.log(p.S_t) - math.log(float(np.nextafter(0.0, 1.0))) - 1.0
+            if p.S_t > 0.0 else 0.0
+        )
+        if p.S_t > 0.0 and q_limit <= 0.0:
+            return None
+        lower = [max(x_upper * 1e-14, np.finfo(float).tiny)]
+        upper = [x_upper * (1.0 - 1e-12)]
+        if p.Ni_t > 0.0:
+            lower.append(0.0)
+            upper.append(p.Ni_t)
+        if p.Si_t > 0.0:
+            lower.append(0.0)
+            upper.append(p.Si_t)
+        if p.S_t > 0.0:
+            lower.append(-q_limit)
+            upper.append(q_limit)
+        bounds = (np.asarray(lower), np.asarray(upper))
+        size = 5 if p.S_t > 0.0 else 4
+
+        def state_at(coordinates: Sequence[float]) -> Tuple[np.ndarray, Dict[str, float], float]:
+            x_ = float(coordinates[0])
+            coordinate_index = 1
+            if p.Ni_t > 0.0:
+                y_ = float(coordinates[coordinate_index])
+                coordinate_index += 1
+            else:
+                y_ = 0.0
+            if p.Si_t > 0.0:
+                z_ = float(coordinates[coordinate_index])
+                coordinate_index += 1
+            else:
+                z_ = 0.0
+            a_, b_, c_ = p.Fe_t - x_, p.Ni_t - y_, p.Si_t - z_
+            d_raw = oxygen_total - x_ - y_ - 2.0 * z_
+            # A negative oxygen trial stays in the optimization objective via
+            # oxygen_penalty. Final acceptance rejects it; this provisional
+            # value only keeps activity and KD evaluations finite.
+            d_ = max(d_raw, 0.0)
+            if p.S_t > 0.0:
+                q_value = float(coordinates[coordinate_index])
+                s_met, s_sil = self._sulfur_amounts_from_log_ratio(p.S_t, q_value)
+            else:
+                q_value, s_met, s_sil = 0.0, 0.0, 0.0
+            metal_sum = a_ + b_ + c_ + d_ + s_met
+            sil_sum = x_ + y_ + z_ + p.u + p.m + p.n + s_sil
+            if min(a_, b_, c_, metal_sum, sil_sum) < 0.0 or metal_sum <= 0.0 or sil_sum <= 0.0:
+                raise PhysicalStateError("Direct trial has an invalid phase inventory.")
+            ternary_sum = a_ + b_ + s_met
+            if ternary_sum <= 0.0:
+                raise PhysicalStateError("Direct trial has no Fe-Ni-S phase.")
+            x_ni = b_ / ternary_sum
+            x_s = s_met / ternary_sum
+            activity = self.sulfur_kd_calculator.activity_model(X_Ni=x_ni, X_S=x_s)
+            ln_fe = activity.ln_gamma("Fe")
+            ln_ni = activity.ln_gamma("Ni")
+            ln_s = activity.ln_gamma("S")
+            kd_ni = p.KD_Ni * math.exp(ln_fe - ln_ni)
+            state = {
+                "x_": x_, "a_": a_, "y_": y_, "b_": b_,
+                "z_": z_, "c_": c_, "d_": d_,
+                "S_met_": s_met, "S_sil_": s_sil,
+                "KD_Ni_effective": kd_ni,
+                "KD_Ni_base": p.KD_Ni,
+                "KD_Ni_activity_factor": kd_ni / p.KD_Ni,
+                "gamma_Fe_metal": math.exp(ln_fe),
+                "gamma_Ni_metal": math.exp(ln_ni),
+                "gamma_S_metal": math.exp(ln_s),
+                "X_Fe_ternary": a_ / ternary_sum,
+                "X_Ni_ternary": x_ni,
+                "X_S_ternary": x_s,
+            }
+            ni_residual = _normalized_difference(b_ * x_, kd_ni * y_ * a_)
+            si_residual = _normalized_difference(
+                c_ * x_**2 * metal_sum,
+                p.KD_Si * z_ * a_**2 * sil_sum,
+            )
+            if p.S_t > 0.0:
+                d_weight, d_mole, log_d_mole = self._sulfur_coefficients(state)
+                s_residual = q_value + math.log(sil_sum / metal_sum) - log_d_mole
+            else:
+                d_weight, d_mole, s_residual = 0.0, 0.0, 0.0
+            state.update(
+                D_S_weight=d_weight, D_S_mole=d_mole,
+                sulfur_residual=s_residual,
+                coupled_residual=ni_residual,
+                coupled_iterations=0,
+                coupled_converged=abs(ni_residual) <= self.coupled_tol,
+            )
+            kd_o = a_ * d_ * sil_sum / (x_ * metal_sum**2)
+            o_residual = (
+                math.log10(kd_o / target)
+                if d_raw > 0.0 and kd_o > 0.0
+                else -8.0 + 100.0 * d_raw / max(oxygen_total, self._inventory_scale)
+            )
+            oxygen_penalty = min(d_raw, 0.0) / max(oxygen_total, self._inventory_scale)
+            residuals = np.asarray(
+                [ni_residual, si_residual]
+                + ([s_residual] if p.S_t > 0.0 else [])
+                + [o_residual, 100.0 * oxygen_penalty],
+                dtype=float,
+            )
+            return residuals, state, kd_o
+
+        def objective(coordinates: np.ndarray) -> np.ndarray:
+            try:
+                return state_at(coordinates)[0]
+            except (SulfurSolverError, ValueError, ArithmeticError, OverflowError):
+                # This start cannot be evaluated by the physical models.
+                return np.full(size, 1e3, dtype=float)
+
+        seed_x = x_hint or self._oxygen_seed_from_sulfur_free_limit(target)
+        if seed_x is None:
+            seed_x = min(x_upper * 0.01, oxygen_total * 0.01)
+        seeds: list[np.ndarray] = []
+
+        def add_seed(x_value: float, y_value: float, z_value: float, q_value: float) -> None:
+            values = [x_value]
+            if p.Ni_t > 0.0:
+                values.append(y_value)
+            if p.Si_t > 0.0:
+                values.append(z_value)
+            if p.S_t > 0.0:
+                values.append(q_value)
+            seed = np.clip(np.asarray(values, dtype=float), bounds[0] + 1e-14 * (bounds[1] - bounds[0]), bounds[1] - 1e-14 * (bounds[1] - bounds[0]))
+            seeds.append(seed)
+
+        for _, _, state in sorted(sampled_states, key=lambda item: abs(item[1]))[:3]:
+            s_met = float(state.get("S_met_", 0.0))
+            s_sil = float(state.get("S_sil_", 0.0))
+            q_value = math.log(s_met / s_sil) if s_met > 0.0 and s_sil > 0.0 else 0.0
+            add_seed(state["x_"], state["y_"], state["z_"], q_value)
+        for x_factor, q_value in (
+            (1.0, 0.0), (0.8, 6.0), (1.2, 6.0),
+            (1.0, -6.0), (1.0, 20.0), (1.0, -20.0),
+        ):
+            x_value = min(max(seed_x * x_factor, bounds[0][0]), bounds[1][0])
+            denominator = (p.Fe_t - x_value) * p.KD_Ni + x_value
+            y_value = x_value * p.Ni_t / denominator if denominator > 0.0 else 0.0
+            d_seed = min(oxygen_total * 1e-4, x_value * 0.1)
+            z_value = min(
+                p.Si_t,
+                max((oxygen_total - x_value - y_value - d_seed) * 0.5, 0.0),
+            )
+            add_seed(x_value, y_value, z_value, q_value)
+
+        for seed in seeds:
+            try:
+                fit = least_squares(
+                    objective, seed, bounds=bounds, method="trf",
+                    max_nfev=300, xtol=1e-12, ftol=1e-12, gtol=1e-12,
+                )
+                residuals, state, kd_o = state_at(fit.x)
+                if abs(residuals[-1]) > self.physical_tol:
+                    continue
+                if (
+                    abs(residuals[0]) > self.direct_major_tol
+                    or abs(residuals[1]) > self.direct_major_tol
+                    or (p.S_t > 0.0 and abs(residuals[2]) > self.sulfur_tol)
+                    or abs(math.log10(kd_o / target)) > tol
+                ):
+                    continue
+                state = self._finalize_forward_state(
+                    state,
+                    sulfur_iterations=int(fit.nfev),
+                    sulfur_converged=p.S_t == 0.0 or abs(state["sulfur_residual"]) <= self.sulfur_tol,
+                    major_tol=self.direct_major_tol,
+                )
+                return self._result(
+                    kd_o, target, state,
+                    oxygen_tol=tol, oxygen_converged=True,
+                )
+            except (SulfurSolverError, ValueError, ArithmeticError, OverflowError):
+                continue
+        return None
+
     def solve_x_for_KD_O(
         self,
         KD_O_target: float,
@@ -2360,7 +2666,13 @@ class ForwardKDOSolverSulfur:
         grid_N: int = 200,
         x_hint: Optional[float] = None,
     ) -> SulfurKDResult:
-        """Strictly solve ``log10(KD_O / KD_O_target) = 0``."""
+        """Match oxygen KD with audited simultaneous and nested strategies.
+
+        ``tol`` bounds ``abs(log10(KD_O / KD_O_target))``. Thorough mode tries
+        the simultaneous solve first, then connected physical root search and
+        a denser Ni retry. Fast mode starts with the nested search. A numerical
+        fit is never returned solely because its optimizer reports success.
+        """
 
         if not math.isfinite(KD_O_target) or KD_O_target <= 0.0:
             raise ValueError("KD_O_target must be finite and positive.")
@@ -2372,6 +2684,14 @@ class ForwardKDOSolverSulfur:
         x_upper = min(self.p.Fe_t, self._total_O())
         if x_upper <= 0.0:
             raise OxygenKDNotReachableError("No positive FeO interval exists.")
+        # The bounded simultaneous solve avoids repeatedly nesting a global
+        # sulfur/Ni search inside every FeO probe.  Retain the connected-root
+        # search below as an independent fallback for difficult branches.
+        direct_result = self._solve_direct_constrained_oxygen(
+            KD_O_target, tol=tol, x_hint=x_hint, sampled_states=(),
+        )
+        if direct_result is not None:
+            return direct_result
         x_edge = max(np.nextafter(0.0, 1.0), x_upper * 1e-14)
         valid_samples: list[Tuple[float, float, Dict[str, float]]] = []
         sample_by_x: Dict[float, Tuple[float, float, Dict[str, float]]] = {}
@@ -2395,6 +2715,8 @@ class ForwardKDOSolverSulfur:
             sample_by_x[x_value] = sampled
             attempted[x_value] = True
 
+        if x_hint is None and self.root_search == "thorough":
+            x_hint = self._oxygen_seed_from_sulfur_free_limit(KD_O_target)
         hint = self.p.Fe_t * 0.5 if x_hint is None else float(x_hint)
         # Evaluate the caller's continuation state first. A set followed by
         # sorting previously destroyed this priority and allowed unrelated
@@ -2567,6 +2889,18 @@ class ForwardKDOSolverSulfur:
         if solved is not None:
             return solved
 
+        # The sulfur-free major-element solution often lies just inside the
+        # d=0 physical boundary.  Probe its local neighborhood before a wide
+        # scan spends its budget on unrelated, disconnected branches.
+        if x_hint is not None:
+            for relative_offset in (1e-4, 1e-3, 1e-2, 0.05, 0.1, 0.25):
+                sample(min(max(hint * (1.0 - relative_offset), x_edge), x_upper))
+                sample(min(max(hint * (1.0 + relative_offset), x_edge), x_upper))
+            refine_valid_boundaries()
+            solved = try_current_roots()
+            if solved is not None:
+                return solved
+
         # Fallback only: a small bounded scan identifies genuinely
         # non-monotonic or disconnected intervals after boundary refinement.
         fallback_n = (
@@ -2576,6 +2910,14 @@ class ForwardKDOSolverSulfur:
         )
         for index in range(1, fallback_n):
             sample(x_edge + (x_upper - x_edge) * index / fallback_n)
+        # Uniform FeO scans can skip a connected physical window close to
+        # zero. A bounded geometric scan fills that gap without a caller hint
+        # or an unbounded increase in the global grid size.
+        if not valid_samples or not any(classify_connected()):
+            geometric_x = x_upper / 1.25
+            while geometric_x >= x_upper * 1e-4:
+                sample(max(geometric_x, x_edge))
+                geometric_x /= 1.25
         for _ in range(3):
             refine_valid_boundaries()
             solved = try_current_roots()
@@ -2584,6 +2926,20 @@ class ForwardKDOSolverSulfur:
 
         valid_samples.sort(key=lambda item: item[0])
         if not valid_samples:
+            direct_result = self._solve_direct_constrained_oxygen(
+                KD_O_target, tol=tol, x_hint=x_hint, sampled_states=(),
+            )
+            if direct_result is not None:
+                return direct_result
+            retry_result = self._retry_oxygen_root_with_dense_ni(
+                KD_O_target,
+                tol=tol,
+                max_iter=max_iter,
+                grid_N=grid_N,
+                x_hint=x_hint,
+            )
+            if retry_result is not None:
+                return retry_result
             raise OxygenKDNotReachableError(
                 f"No physically valid positive-KD oxygen state was found "
                 f"within the {self.root_search} search budget "
@@ -2602,6 +2958,21 @@ class ForwardKDOSolverSulfur:
                 failure_reason="No oxygen-KD sign-changing bracket.",
             )
         achieved = [kd_by_x[item[0]] for item in valid_samples]
+        direct_result = self._solve_direct_constrained_oxygen(
+            KD_O_target, tol=tol, x_hint=x_hint,
+            sampled_states=valid_samples,
+        )
+        if direct_result is not None:
+            return direct_result
+        retry_result = self._retry_oxygen_root_with_dense_ni(
+            KD_O_target,
+            tol=tol,
+            max_iter=max_iter,
+            grid_N=grid_N,
+            x_hint=x_hint,
+        )
+        if retry_result is not None:
+            return retry_result
         raise OxygenKDNotReachableError(
             f"No oxygen-KD root was found within the {self.root_search} "
             f"search budget ({fallback_n} subdivisions). "
@@ -3356,6 +3727,139 @@ class SulfurDifferentiationEventDriver:
         )
 
 
+class EarlyComUpdater_S:
+    """Initialize particle compositions with primordial sulfur differentiation.
+
+    Input compositions map meteorite types to component amounts in mol per
+    100 g of complete source-body mass. Particle source-mass fractions weight
+    these inventories directly. Normalizing each meteorite column by its own
+    total mole count would erase the amount supplied per unit mass. S is total
+    bulk sulfur; S_sil and S_met sum to S on the same scale. Unmodeled mass is
+    carried separately by the workflow and never enters this solver.
+
+    Ni, Si, and O reference KD values come from ``SulfurKDCalculator``.
+    The default thorough solver tries the bounded simultaneous equations
+    first and retains connected-root search as a fallback. ``oxygen_tol``
+    limits the absolute log10 oxygen-KD residual (default 1e-8).
+    """
+
+    _PHASE_COLUMNS = {
+        "x_": "FeO", "y_": "NiO", "z_": "SiO2",
+        "a_": "Fe", "b_": "Ni", "c_": "Si", "d_": "O",
+        "S_sil_": "S_sil", "S_met_": "S_met",
+    }
+    _BULK_COLUMNS = (
+        "MgO", "Al2O3", "CaO", "FeO", "NiO", "SiO2",
+        "Fe", "Ni", "Si", "O", "S",
+    )
+
+    def __init__(
+        self,
+        df: pd.DataFrame,
+        dict_com: Mapping[str, Mapping[str, float]],
+        keys_list: Sequence[str],
+        m_ratio: bool = True,
+        *,
+        sulfur_kd_calculator: Optional[SulfurKDCalculator] = None,
+        solver_kwargs: Optional[Mapping[str, object]] = None,
+        oxygen_tol: float = 1e-8,
+    ) -> None:
+        if not isinstance(df, pd.DataFrame):
+            raise TypeError("df must be a pandas DataFrame.")
+        self.df = df
+        self.dict_com = dict_com
+        self.keys_list = tuple(keys_list)
+        self.m_ratio = bool(m_ratio)
+        self.sulfur_kd_calculator = sulfur_kd_calculator or SulfurKDCalculator()
+        self.solver_kwargs = {"root_search": "thorough", **dict(solver_kwargs or {})}
+        self.oxygen_tol = float(oxygen_tol)
+        if not math.isfinite(self.oxygen_tol) or self.oxygen_tol <= 0.0:
+            raise ValueError("oxygen_tol must be finite and positive.")
+        missing = set(self._BULK_COLUMNS) - set(self.keys_list)
+        if missing:
+            raise ValueError(f"keys_list must include {sorted(missing)}.")
+        if not self.dict_com:
+            raise ValueError("dict_com must contain at least one meteorite type.")
+        for kind, composition in self.dict_com.items():
+            missing = set(self._BULK_COLUMNS) - set(composition)
+            if missing:
+                raise ValueError(f"Composition {kind!r} lacks {sorted(missing)}.")
+            for name in self._BULK_COLUMNS:
+                value = float(composition[name])
+                if not math.isfinite(value) or value < 0.0:
+                    raise ValueError(
+                        f"Composition {kind!r} has invalid {name!r}."
+                    )
+        for name in ("i", "P", "T"):
+            if name not in self.df.columns:
+                raise ValueError(f"df must contain {name!r}.")
+
+    def update_row(self, pid: int) -> SulfurKDResult:
+        matches = self.df.index[self.df["i"] == pid]
+        if len(matches) != 1:
+            raise ValueError(f"Particle {pid!r} must appear exactly once.")
+        row_index = matches[0]
+        row = self.df.loc[row_index]
+        ratio_suffix = "_ratio" if self.m_ratio else ""
+        weights = {}
+        for kind in self.dict_com:
+            column = f"{kind}{ratio_suffix}"
+            if column not in self.df.columns:
+                raise ValueError(f"Missing mixing column {column!r}.")
+            weight = float(row[column])
+            if not math.isfinite(weight) or weight < 0.0:
+                raise ValueError(f"Invalid mixing weight {column!r} for {pid!r}.")
+            weights[kind] = weight
+        if not math.isclose(sum(weights.values()), 1.0, rel_tol=0.0, abs_tol=1e-8):
+            raise ValueError(f"Mixing weights for {pid!r} must sum to one.")
+
+        bulk = {
+            name: sum(float(comp[name]) * weights[kind]
+                      for kind, comp in self.dict_com.items())
+            for name in self._BULK_COLUMNS
+        }
+        pressure, temperature = float(row["P"]), float(row["T"])
+        params = sulfur_params_from_composition(
+            bulk,
+            P=pressure,
+            T=temperature,
+            major_kd_calculator=self.sulfur_kd_calculator,
+        )
+        solver = ForwardKDOSolverSulfur(
+            params,
+            P=pressure,
+            T=temperature,
+            sulfur_model=sulfur_model_for_event(0),
+            sulfur_kd_calculator=self.sulfur_kd_calculator,
+            **self.solver_kwargs,
+        )
+        target = self.sulfur_kd_calculator.get_KD("O", pressure, temperature)
+        try:
+            result = solver.solve_x_for_KD_O(target, tol=self.oxygen_tol)
+        except SulfurSolverError as exc:
+            raise type(exc)(f"Particle {pid!r}: {exc}") from exc
+        if not result.overall_converged:
+            raise PhysicalStateError(
+                f"Primordial differentiation did not converge for {pid!r}."
+            )
+        outputs = {
+            column: float(getattr(result, name))
+            for name, column in self._PHASE_COLUMNS.items()
+        }
+        outputs.update(
+            MgO=bulk["MgO"], Al2O3=bulk["Al2O3"],
+            CaO=bulk["CaO"], S=bulk["S"],
+        )
+        for column, value in outputs.items():
+            self.df.at[row_index, column] = value
+        return result
+
+    def batch_update(self) -> Dict[int, SulfurKDResult]:
+        """Update every particle and return its audited solver result."""
+
+        return {int(pid): self.update_row(int(pid)) for pid in self.df["i"]}
+
+
 __all__ = [
     "MA2001_FE_S_NI_EPSILON_1873K",
     "MA2001_FE_S_NI_GAMMA0_1873K",
@@ -3386,4 +3890,5 @@ __all__ = [
     "sulfur_model_for_event",
     "sulfur_params_from_composition",
     "SulfurDifferentiationEventDriver",
+    "EarlyComUpdater_S",
 ]

@@ -2,6 +2,7 @@ import math
 from dataclasses import replace
 
 import pytest
+import pandas as pd
 
 from accrediff.differentiation import ForwardKDOSolver, KD_Params
 from accrediff.chemistry import MolarMassCalculator
@@ -17,6 +18,7 @@ from accrediff.differentiation_sulfur import (
     MA2001_FE_S_NI_GAMMA0_1873K,
     Ma2001TernaryActivity,
     OxygenKDNotReachableError,
+    PhysicalStateError,
     SulfurPartitionNotReachableError,
     SulfurDifferentiationEventDriver,
     SulfurKDCalculator,
@@ -28,7 +30,233 @@ from accrediff.differentiation_sulfur import (
     sulfur_model_for_event,
     sulfur_params_from_composition,
     audit_physical_state,
+    EarlyComUpdater_S,
 )
+
+
+def test_early_sulfur_updater_preserves_bulk_sulfur_and_phase_balance():
+    composition = {
+        "MgO": 1.0, "Al2O3": 0.033365, "CaO": 0.047377,
+        "FeO": 0.0, "NiO": 0.000511, "SiO2": 1.190021,
+        "Fe": 0.898466, "Ni": 0.050613, "Si": 0.053473,
+        "O": 0.0, "S": 0.132997,
+    }
+    total = sum(composition.values())
+    composition = {name: value / total for name, value in composition.items()}
+    df = pd.DataFrame([{"i": 7, "P": 20.0, "T": 2500.0, "EC_ratio": 1.0}])
+    updater = EarlyComUpdater_S(df, {"EC": composition}, list(composition))
+
+    result = updater.update_row(7)
+
+    assert result.overall_converged
+    assert result.sulfur_model == "rose_weston"
+    assert df.at[0, "S"] == pytest.approx(composition["S"])
+    assert df.at[0, "S_met"] + df.at[0, "S_sil"] == pytest.approx(df.at[0, "S"])
+    assert df.at[0, "Fe"] + df.at[0, "FeO"] == pytest.approx(
+        composition["Fe"] + composition["FeO"]
+    )
+
+
+def test_early_sulfur_updater_rejects_nonunit_mixing_weights_without_writing():
+    composition = {name: 0.1 for name in EarlyComUpdater_S._BULK_COLUMNS}
+    df = pd.DataFrame([{"i": 7, "P": 20.0, "T": 2500.0, "EC_ratio": 0.5}])
+    updater = EarlyComUpdater_S(df, {"EC": composition}, list(composition))
+
+    with pytest.raises(ValueError, match="sum to one"):
+        updater.update_row(7)
+    assert "S_met" not in df.columns
+
+
+@pytest.mark.parametrize(
+    ("kind", "composition", "pressure", "temperature"),
+    [
+        (
+            "EF",
+            {"MgO": 1.0, "Al2O3": 0.059478, "CaO": 0.086850,
+             "FeO": 0.0, "NiO": 0.000460, "SiO2": 0.483255,
+             "Fe": 0.843824, "Ni": 0.045543, "Si": 0.098986,
+             "O": 0.0, "S": 0.0},
+            0.425042245021645, 1897.2472236764704,
+        ),
+        (
+            "EC",
+            {"MgO": 1.0, "Al2O3": 0.033365, "CaO": 0.047377,
+             "FeO": 0.0, "NiO": 0.000511, "SiO2": 1.190021,
+             "Fe": 0.898466, "Ni": 0.050613, "Si": 0.053473,
+             "O": 0.0, "S": 0.132997},
+            0.4302728311688312, 1897.5294260454125,
+        ),
+    ],
+)
+def test_early_low_pressure_narrow_roots_are_found_without_external_hints(
+    kind, composition, pressure, temperature,
+):
+    total = sum(composition.values())
+    composition = {name: value / total for name, value in composition.items()}
+    df = pd.DataFrame([{
+        "i": 7, "P": pressure, "T": temperature, f"{kind}_ratio": 1.0,
+    }])
+
+    result = EarlyComUpdater_S(
+        df, {kind: composition}, list(composition)
+    ).update_row(7)
+
+    assert result.overall_converged
+    assert abs(result.residuals["O_KD_log"]) <= 1e-10
+    assert df.at[0, "S_met"] + df.at[0, "S_sil"] == pytest.approx(
+        df.at[0, "S"]
+    )
+
+
+def _low_pressure_ef_ec_params(ef_ratio, pressure, temperature):
+    raw = {
+        "EF": {"MgO": 1.0, "Al2O3": 0.05947830316804066,
+               "CaO": 0.08684990770094388, "FeO": 0.0,
+               "NiO": 0.00045999698151029524,
+               "SiO2": 0.48325481450505636, "Fe": 0.843823556122992,
+               "Ni": 0.04554271425471345, "Si": 0.0989859990382598,
+               "O": 0.0, "S": 0.0},
+        "EC": {"MgO": 1.0, "Al2O3": 0.03336495955668685,
+               "CaO": 0.047377089884535796, "FeO": 0.0,
+               "NiO": 0.0005112284137501485,
+               "SiO2": 1.1900214117266228, "Fe": 0.8984657116477826,
+               "Ni": 0.05061328039270932, "Si": 0.053473454702761256,
+               "O": 0.0, "S": 0.132996744712326},
+    }
+    normalized = {
+        kind: {name: amount / sum(values.values())
+               for name, amount in values.items()}
+        for kind, values in raw.items()
+    }
+    composition = {
+        name: ef_ratio * normalized["EF"][name]
+        + (1.0 - ef_ratio) * normalized["EC"][name]
+        for name in raw["EF"]
+    }
+    calculator = SulfurKDCalculator()
+    params = sulfur_params_from_composition(
+        composition, P=pressure, T=temperature,
+        major_kd_calculator=calculator,
+    )
+    return params, calculator
+
+
+def test_thorough_fixed_feo_state_is_independent_of_probe_order():
+    pressure, temperature = 0.6280749636363636, 1908.1325850398762
+    params, calculator = _low_pressure_ef_ec_params(
+        0.747947130754649, pressure, temperature,
+    )
+    def make_solver():
+        return ForwardKDOSolverSulfur(
+            params, P=pressure, T=temperature,
+            sulfur_model="rose_weston", sulfur_kd_calculator=calculator,
+            root_search="thorough",
+        )
+
+    cold = make_solver().compute_KD_O_from_x(0.00055)[0]
+    warm_solver = make_solver()
+    warm_solver.compute_KD_O_from_x(0.0005)
+    warm = warm_solver.compute_KD_O_from_x(0.00055)[0]
+    assert warm == pytest.approx(cold, rel=1e-12)
+
+
+@pytest.mark.parametrize(
+    ("ef_ratio", "pressure", "temperature"),
+    [
+        (1.0, 0.4341432484848485, 1897.7381837070427),
+        (0.747947130754649, 0.6280749636363636, 1908.1325850398762),
+    ],
+)
+def test_direct_constrained_primary_solver_works_without_nested_search(
+    monkeypatch, ef_ratio, pressure, temperature,
+):
+    params, calculator = _low_pressure_ef_ec_params(
+        ef_ratio, pressure, temperature,
+    )
+    solver = ForwardKDOSolverSulfur(
+        params, P=pressure, T=temperature,
+        sulfur_model="rose_weston", sulfur_kd_calculator=calculator,
+        root_search="thorough",
+    )
+    def unavailable(_):
+        raise PhysicalStateError("Nested search unavailable in regression test.")
+    monkeypatch.setattr(solver, "forward_solve", unavailable)
+
+    target = calculator.get_KD("O", pressure, temperature)
+    result = solver.solve_x_for_KD_O(target, tol=1e-8)
+
+    assert result.overall_converged
+    assert abs(result.residuals["O_KD_log"]) <= 1e-8
+    assert result.S_met_ + result.S_sil_ == pytest.approx(params.S_t)
+
+
+def test_connected_root_search_remains_available_after_direct_trial_fails(monkeypatch):
+    pressure, temperature = 0.4341432484848485, 1897.7381837070427
+    params, calculator = _low_pressure_ef_ec_params(1.0, pressure, temperature)
+    solver = ForwardKDOSolverSulfur(
+        params, P=pressure, T=temperature,
+        sulfur_model="rose_weston", sulfur_kd_calculator=calculator,
+        root_search="thorough",
+    )
+    monkeypatch.setattr(solver, "_solve_direct_constrained_oxygen", lambda *args, **kwargs: None)
+
+    result = solver.solve_x_for_KD_O(
+        calculator.get_KD("O", pressure, temperature), tol=1e-8,
+    )
+
+    assert result.overall_converged
+    assert abs(result.residuals["O_KD_log"]) <= 1e-8
+
+
+def test_direct_primary_ci_solution_accepts_well_conditioned_phase_amounts():
+    raw = {
+        "MgO": 1.0, "Al2O3": 0.03965220211202711,
+        "CaO": 0.057899938467295915, "FeO": 0.8438184775834783,
+        "NiO": 0.046000511625474076, "SiO2": 0.9703911599142747,
+        "Fe": 0.0, "Ni": 0.0, "Si": 0.0, "O": 0.0,
+        "S": 0.8492003665032931,
+    }
+    composition = {name: amount / sum(raw.values())
+                   for name, amount in raw.items()}
+    pressure, temperature = 0.3940523374891775, 1895.5733195773523
+    calculator = SulfurKDCalculator()
+    params = sulfur_params_from_composition(
+        composition, P=pressure, T=temperature,
+        major_kd_calculator=calculator,
+    )
+    solver = ForwardKDOSolverSulfur(
+        params, P=pressure, T=temperature,
+        sulfur_model="rose_weston", sulfur_kd_calculator=calculator,
+        root_search="thorough",
+    )
+
+    result = solver.solve_x_for_KD_O(
+        calculator.get_KD("O", pressure, temperature), tol=1e-8,
+    )
+
+    assert result.overall_converged
+    assert result.x_ == pytest.approx(0.1940263559049802, abs=1e-10)
+    assert result.S_met_ + result.S_sil_ == pytest.approx(params.S_t)
+    assert abs(result.residuals["Si_equilibrium"]) <= solver.direct_major_tol
+
+
+def test_direct_constrained_fallback_handles_zero_ni_and_si_inventories():
+    params = SulfurKDParams(
+        Fe_t=1.0, Ni_t=0.0, Si_t=0.0, O_L=0.9,
+        KD_Ni=1.0, KD_Si=1.0, u=1.0, m=0.0, n=0.0, S_t=0.0,
+    )
+    solver = ForwardKDOSolverSulfur(
+        params, P=1.0, T=2000.0, sulfur_model="rose_weston",
+        root_search="thorough",
+    )
+
+    result = solver._solve_direct_constrained_oxygen(
+        0.01, tol=1e-8, x_hint=0.05, sampled_states=(),
+    )
+
+    assert result is not None and result.overall_converged
+    assert result.y_ == 0.0 and result.z_ == 0.0
+    assert result.KD_O_ == pytest.approx(0.01, rel=1e-8)
 
 MOLAR_MASS = MolarMassCalculator()
 COMPONENT_MOLAR_MASS = {
@@ -212,7 +440,6 @@ def test_boujibar_function_returns_molar_coefficient():
     )
     expected = 10**log_d_weight * kwargs["MW_metal"] / kwargs["MW_silicate"]
     assert actual == pytest.approx(expected)
-
     assert actual == pytest.approx(42.23846633617064)
 
 

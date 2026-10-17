@@ -79,6 +79,7 @@ from .differentiation_sulfur import (
     sulfur_model_for_event,
     sulfur_params_from_composition,
     SulfurDifferentiationEventDriver,
+    EarlyComUpdater_S,
 )
 
 # --- Melt scaling (Nakajima et al. 2021 style) ---
@@ -172,6 +173,7 @@ __all__ = [
     "sulfur_model_for_event",
     "sulfur_params_from_composition",
     "SulfurDifferentiationEventDriver",
+    "EarlyComUpdater_S",
     # gas migration
     "Gas_ModelConfig",
     "Gas_UnitSystem",
