@@ -198,7 +198,7 @@ def test_boujibar_function_returns_molar_coefficient():
     log_cs = -5.704 + 3.15 * 0.20 + 2.65 * 0.05 + 0.12 * 0.40
     lsi = math.log10(1.0 - w_si)
     log_d_weight = (
-        math.log10(w_feo)
+        math.log10(100.0 * w_feo)
         - log_cs
         + 405 / 2500.0
         + 136 * 20.0 / 2500.0
@@ -212,6 +212,56 @@ def test_boujibar_function_returns_molar_coefficient():
     )
     expected = 10**log_d_weight * kwargs["MW_metal"] / kwargs["MW_silicate"]
     assert actual == pytest.approx(expected)
+
+    assert actual == pytest.approx(42.23846633617064)
+
+
+@pytest.mark.parametrize("al2o3_mass", [0.0, 12.0])
+def test_boujibar_phase_chain_matches_oxide_mass_reference(al2o3_mass):
+    # Independent mass inventories: Al2O3 formula units are distinct from
+    # the solver's AlO1.5 units. These are formula probes, not equilibrium roots.
+    oxide_mass = dict(FeO=8.0, NiO=0.2, SiO2=45.0, MgO=30.0,
+                      Al2O3=al2o3_mass, CaO=4.0)
+    oxide_moles = {name: mass / MOLAR_MASS.molar_mass(name)
+                   for name, mass in oxide_mass.items()}
+    metal_mass = dict(Fe=80.0, Ni=5.0, Si=5.0, O=1.0, S=9.0)
+    metal_moles = {name: mass / Elements[name]
+                   for name, mass in metal_mass.items()}
+    sil_s = 2.0 / Elements["S"]
+    params = replace(sulfur_params(), u=oxide_moles["MgO"],
+                     m=2.0 * oxide_moles["Al2O3"], n=oxide_moles["CaO"])
+    state = dict(x_=oxide_moles["FeO"], y_=oxide_moles["NiO"],
+                 z_=oxide_moles["SiO2"], a_=metal_moles["Fe"],
+                 b_=metal_moles["Ni"], c_=metal_moles["Si"],
+                 d_=metal_moles["O"], S_met_=metal_moles["S"], S_sil_=sil_s)
+    instance = solver(params, model="boujibar")
+    phase = instance._phase_properties(state, params)
+    oxide_total = sum(oxide_moles.values())
+    sil_total = oxide_total + oxide_moles["Al2O3"] + sil_s
+    metal_total = sum(metal_moles.values())
+    sil_mass = sum(oxide_mass.values()) + 2.0
+    assert phase["oxide_sum"] == pytest.approx(oxide_total)
+    assert phase["sil_sum"] == pytest.approx(sil_total)
+    assert phase["metal_sum"] == pytest.approx(metal_total)
+    assert phase["MW_silicate"] == pytest.approx(sil_mass / sil_total)
+    assert phase["MW_metal"] == pytest.approx(100.0 / metal_total)
+
+    log_cs = -5.704 + sum(coef * oxide_moles[name] / oxide_total
+                         for name, coef in [("FeO", 3.15), ("CaO", 2.65),
+                                            ("MgO", 0.12)])
+    lsi = math.log10(1.0 - metal_mass["Si"] / 100.0)
+    log_dw = (math.log10(100.0 * oxide_mass["FeO"] / sil_mass) - log_cs
+              + 405.0 / 2500.0 + 136.0 * 20.0 / 2500.0
+              + 32.0 * lsi + 181.0 * lsi**2 + 305.0 * lsi**3
+              + sum(coef * math.log10(1.0 - metal_mass[name] / 100.0)
+                    for name, coef in [("Fe", 1.13), ("Ni", 10.7), ("O", 31.4)])
+              - 3.72)
+    expected_weight = 10.0**log_dw
+    expected_mole = expected_weight * (100.0 / metal_total) / (sil_mass / sil_total)
+    weight, mole, log_mole = instance._sulfur_coefficients(state)
+    assert weight == pytest.approx(expected_weight)
+    assert mole == pytest.approx(expected_mole)
+    assert log_mole == pytest.approx(math.log(expected_mole))
 
 
 def test_boujibar_rejects_inconsistent_phase_average_molar_mass():

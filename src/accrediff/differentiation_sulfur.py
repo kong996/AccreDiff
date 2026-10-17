@@ -896,8 +896,8 @@ def _log_D_S_model_boujibar_molar(
     Inputs are mole fractions.  Internally:
 
     * Eq. 6 uses oxide-normalized mole fractions, with sulfur excluded;
-    * Eq. 11 uses mass fractions, converted here from whole-phase mole
-      fractions and phase-average molar masses;
+    * Eq. 11 uses FeO weight percent and metal mass fractions, converted
+      here from whole-phase mole fractions and phase-average molar masses;
     * Eq. 11's mass-concentration result is converted back to ``D_S_mole``.
 
     Model scope
@@ -984,11 +984,11 @@ def _log_D_S_model_boujibar_molar(
     # TODO(science): add +0.77 X_TiO2 +0.75 (X_Na2O + X_K2O) when tracked.
     log_cs = -5.704 + 3.15 * x_feo_oxide + 2.65 * x_cao_oxide + 0.12 * x_mgo_oxide
 
-    # Boujibar et al. (2014), Eq. 11.  All composition terms here are mass
-    # fractions, including FeO in silicate.
+    # Boujibar et al. (2014), Eq. 11: FeO is in wt%, while metal
+    # compositions are mass fractions. log10(100 * w_feo) = log10(w_feo) + 2.
     log_one_minus_si = math.log10(1.0 - w_si)
     log_d_weight = (
-        math.log10(w_feo)
+        math.log10(w_feo) + 2.0
         - log_cs
         + 405.0 / T
         + 136.0 * P / T
@@ -1863,7 +1863,8 @@ class ForwardKDOSolverSulfur:
             + p.n
             + sol["S_sil_"]
         )
-        oxide_sum = sol["x_"] + sol["y_"] + sol["z_"] + p.u + p.m + p.n
+        # Capacity uses oxide formula units; p.m counts AlO1.5 units.
+        oxide_sum = sol["x_"] + sol["y_"] + sol["z_"] + p.u + 0.5 * p.m + p.n
         if (
             not math.isfinite(metal_sum)
             or not math.isfinite(sil_sum)
