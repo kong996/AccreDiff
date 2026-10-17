@@ -108,6 +108,11 @@ from .gas_migration import (
 from .plotting import (
     plot_IW_heatmap,
 )
+
+# --- Angular Momentum Deficit (AMD) ---
+from .AMDProcessor import (
+    AMDProcessor, PlanetarySystem
+)
 __all__ = [
     "__version__",
     "__author__",
@@ -196,4 +201,7 @@ __all__ = [
     # "images_to_video",
     # plotting
     "plot_IW_heatmap",
+    # AMDProcessor
+    "AMDProcessor",
+    "PlanetarySystem",
 ]
