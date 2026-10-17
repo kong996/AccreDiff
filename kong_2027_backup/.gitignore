@@ -1,0 +1,5 @@
+# Generated results remain local; source notebooks and scripts are versioned.
+/work_flow_S/Tables/
+/work_flow_S/Figures/
+/work_flow_S_batch/results/
+/work_flow_S_batch/runs/

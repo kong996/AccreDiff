@@ -238,6 +238,10 @@ Earth_bulk_mg = {
     'Ni': 0.04501780421964532,
     'Si': 0.07377113981393096,
     'O': 0.06475722866791628,
+    # Metal-phase sulfur inventory per mole of bulk-planet mantle MgO.
+    # Uses 1.8 wt% S in the core, a 0.325 core mass fraction, and the
+    # Earth mantle MgO abundance/mantle fraction defined above.
+    'S_met': 0.029081886865359004,
 }
 #**************************************************************************************************************************************
 Mars_bulk_mg = {
@@ -251,5 +255,9 @@ Mars_bulk_mg = {
     'Ni': 0.03825564245891938,
     'Si': 0.0,
     'O': 0.09860779569892474,
+    # Metal-phase sulfur inventory per mole of bulk-planet mantle MgO.
+    # Uses 6.6 wt% S in the core, a 0.182 core mass fraction, and the
+    # Mars mantle MgO abundance/mantle fraction defined above.
+    'S_met': 0.062451612903225796,
 }
 #**************************************************************************************************************************************
