@@ -1,0 +1,3 @@
+# Validated REBOUND version for the Python and compiled additional-force APIs.
+# Install AccreDiff's dev/examples extras separately, as described in README.md.
+rebound==4.4.8
